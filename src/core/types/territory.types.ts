@@ -1,3 +1,21 @@
+export interface TerritoryOfficer {
+  id: string;
+  name: string;
+  position: 'Ketua' | 'Sekretaris' | 'Bendahara' | 'Seksi Keamanan' | 'Seksi Sosial' | 'Operator Sistem';
+  phone: string;
+  email: string;
+  status: 'active' | 'pending';
+  registeredAt: string;
+}
+
+export interface TerritoryDemographics {
+  totalKK: number;
+  maleCount: number;
+  femaleCount: number;
+  appAdoptionPercentage: number;
+  verifiedWargaCount: number;
+}
+
 export interface TerritoryItem {
   id: string;
   name: string;
@@ -10,6 +28,8 @@ export interface TerritoryItem {
   workspacesCount: number;
   leaderName: string;
   leaderPhone: string;
+  demographics?: TerritoryDemographics;
+  officers?: TerritoryOfficer[];
   children?: TerritoryItem[];
 }
 

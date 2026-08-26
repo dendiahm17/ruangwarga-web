@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import type { TerritoryItem } from '../core/types/territory.types';
+import type { TerritoryItem, TerritoryOfficer } from '../core/types/territory.types';
 import { mockTerritoryHierarchy } from '../services/mock/mockTerritoryData';
 import { TerritoryTreeNode } from '../components/territory/TerritoryTreeNode';
 import { CreateTerritoryModal } from '../components/territory/CreateTerritoryModal';
 import { EditTerritoryModal } from '../components/territory/EditTerritoryModal';
+import { AddOfficerModal } from '../components/territory/AddOfficerModal';
 import { useScope } from '../context/ScopeContext';
 import { 
   Network, 
@@ -20,7 +21,12 @@ import {
   Globe2,
   CheckCircle2,
   ListTree,
-  UserCheck
+  UserCheck,
+  Smartphone,
+  Home,
+  Trash2,
+  UserPlus,
+  Mail
 } from 'lucide-react';
 
 interface WilayahPageProps {
@@ -33,11 +39,12 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
   const [selectedTerritory, setSelectedTerritory] = useState<TerritoryItem>(mockTerritoryHierarchy);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [tierFilter, setTierFilter] = useState<string>('Semua');
-  const [activeTab, setActiveTab] = useState<'sub' | 'pengurus'>('sub');
+  const [activeTab, setActiveTab] = useState<'sub' | 'pengurus' | 'demografi'>('sub');
   
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isAddOfficerModalOpen, setIsAddOfficerModalOpen] = useState<boolean>(false);
   const [parentTarget, setParentTarget] = useState<TerritoryItem | null>(null);
 
   // Set territory as active scope in the whole platform
@@ -62,7 +69,15 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
       workspacesCount: 0,
       childrenCount: 0,
       leaderName: newTerritory.leaderName || 'Belum Ditetapkan',
-      leaderPhone: newTerritory.leaderPhone || '-'
+      leaderPhone: newTerritory.leaderPhone || '-',
+      demographics: {
+        totalKK: 0,
+        maleCount: 0,
+        femaleCount: 0,
+        appAdoptionPercentage: 0,
+        verifiedWargaCount: 0
+      },
+      officers: []
     };
 
     const insertRecursive = (node: TerritoryItem): TerritoryItem => {
@@ -109,7 +124,71 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
     setSelectedTerritory(prev => ({ ...prev, ...updated }));
   };
 
+  // Add Officer Handler
+  const handleSaveOfficer = (officer: TerritoryOfficer) => {
+    const updatedOfficers = [...(selectedTerritory.officers || []), officer];
+    const updateRecursive = (node: TerritoryItem): TerritoryItem => {
+      if (node.id === selectedTerritory.id) {
+        return {
+          ...node,
+          officers: updatedOfficers
+        };
+      }
+      if (node.children) {
+        return {
+          ...node,
+          children: node.children.map(updateRecursive)
+        };
+      }
+      return node;
+    };
+
+    const updatedRoot = updateRecursive(rootData);
+    setRootData(updatedRoot);
+    setSelectedTerritory(prev => ({ ...prev, officers: updatedOfficers }));
+  };
+
+  // Delete / Deactivate Territory Handler with Safety Protection
+  const handleDeleteTerritory = () => {
+    if (selectedTerritory.children && selectedTerritory.children.length > 0) {
+      alert(`⚠️ Peringatan Keamanan: Wilayah "${selectedTerritory.name}" tidak dapat dihapus karena masih memiliki ${selectedTerritory.children.length} sub-wilayah aktif di bawahnya. Hapus atau pindahkan sub-wilayah terlebih dahulu.`);
+      return;
+    }
+
+    if (selectedTerritory.id === 'indonesia') {
+      alert('Wilayah Pusat Nasional tidak dapat dihapus.');
+      return;
+    }
+
+    const confirmed = window.confirm(`Apakah Anda yakin ingin menghapus wilayah "${selectedTerritory.name}" (${selectedTerritory.code}) dari hierarki sistem?`);
+    if (!confirmed) return;
+
+    const deleteRecursive = (node: TerritoryItem): TerritoryItem => {
+      if (node.children) {
+        return {
+          ...node,
+          children: node.children
+            .filter(c => c.id !== selectedTerritory.id)
+            .map(deleteRecursive)
+        };
+      }
+      return node;
+    };
+
+    const updatedRoot = deleteRecursive(rootData);
+    setRootData(updatedRoot);
+    setSelectedTerritory(rootData);
+  };
+
   const tiersList = ['Semua', 'Provinsi', 'Kab/Kota', 'Kecamatan', 'Desa/Kel', 'RW', 'RT'];
+
+  const demo = selectedTerritory.demographics || {
+    totalKK: Math.round(selectedTerritory.citizensCount / 4),
+    maleCount: Math.round(selectedTerritory.citizensCount * 0.49),
+    femaleCount: Math.round(selectedTerritory.citizensCount * 0.51),
+    appAdoptionPercentage: 72,
+    verifiedWargaCount: Math.round(selectedTerritory.citizensCount * 0.85)
+  };
 
   return (
     <div style={{
@@ -169,11 +248,11 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
       {/* 2-Column Layout: Territory Tree (Left) + Territory Detail (Right) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1.3fr) minmax(0, 1.1fr)',
+        gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1.15fr)',
         gap: '20px'
       }}>
         {/* Left Column: Interactive Tree Explorer */}
-        <div className="futuristic-card" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '640px' }}>
+        <div className="futuristic-card" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '660px' }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span className="futuristic-card-title">POHON HIERARKI WILAYAH</span>
@@ -244,7 +323,7 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Detail Card */}
           <div className="futuristic-card" style={{ padding: '20px' }}>
-            {/* Header with Edit Button & Set as Scope */}
+            {/* Header with Edit, Set Scope & Delete button */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
               <div>
                 <span style={{
@@ -267,8 +346,8 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                 </div>
               </div>
 
-              {/* Edit & Set Scope buttons */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <button
                   onClick={() => setIsEditModalOpen(true)}
                   title="Edit Data Wilayah"
@@ -279,7 +358,7 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                     backgroundColor: '#0a1220',
                     border: '1px solid rgba(56, 189, 248, 0.25)',
                     borderRadius: '6px',
-                    padding: '5px 10px',
+                    padding: '5px 8px',
                     color: '#38bdf8',
                     fontSize: '11px',
                     fontWeight: 700,
@@ -300,7 +379,7 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                     backgroundColor: 'rgba(16, 185, 129, 0.15)',
                     border: '1px solid #10b981',
                     borderRadius: '6px',
-                    padding: '5px 10px',
+                    padding: '5px 8px',
                     color: '#10b981',
                     fontSize: '11px',
                     fontWeight: 700,
@@ -309,13 +388,32 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                   }}
                 >
                   <Globe2 size={13} />
-                  <span>Set Sebagai Scope</span>
+                  <span>Set Scope</span>
                 </button>
+
+                {selectedTerritory.id !== 'indonesia' && (
+                  <button
+                    onClick={handleDeleteTerritory}
+                    title="Hapus Wilayah"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      borderRadius: '6px',
+                      padding: '5px 7px',
+                      color: '#ef4444',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                )}
               </div>
             </div>
 
             {/* 3 Metric Summary Boxes */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '14px' }}>
               <div style={{
                 backgroundColor: '#060b13',
                 border: '1px solid rgba(56, 189, 248, 0.15)',
@@ -360,13 +458,13 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '9px',
+              gap: '8px',
               backgroundColor: 'rgba(15, 23, 42, 0.5)',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               borderRadius: '8px',
-              padding: '12px 14px',
-              fontSize: '11.5px',
-              marginBottom: '16px'
+              padding: '10px 12px',
+              fontSize: '11px',
+              marginBottom: '14px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#94a3b8' }}>Penanggung Jawab / Pejabat</span>
@@ -436,68 +534,229 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
             </div>
           </div>
 
-          {/* Sub-Territories List / Table */}
-          <div className="futuristic-card" style={{ padding: '18px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', marginBottom: '12px' }}>
-              <button
-                onClick={() => setActiveTab('sub')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: activeTab === 'sub' ? '#00e5ff' : '#94a3b8',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <ListTree size={14} />
-                <span>Daftar Sub-Wilayah ({selectedTerritory.children?.length || 0})</span>
-              </button>
+          {/* 3-Tab Bottom Card: Sub-Wilayah, Pengurus & Demografi */}
+          <div className="futuristic-card" style={{ padding: '16px 20px' }}>
+            {/* Tabs Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <button
+                  onClick={() => setActiveTab('sub')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: activeTab === 'sub' ? '#00e5ff' : '#94a3b8',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <ListTree size={14} />
+                  <span>Sub-Wilayah ({selectedTerritory.children?.length || 0})</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('pengurus')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: activeTab === 'pengurus' ? '#00e5ff' : '#94a3b8',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <UserCheck size={14} />
+                  <span>Pengurus ({selectedTerritory.officers?.length || 0})</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('demografi')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: activeTab === 'demografi' ? '#00e5ff' : '#94a3b8',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Smartphone size={14} />
+                  <span>Demografi & Warga</span>
+                </button>
+              </div>
+
+              {/* Contextual Action */}
+              {activeTab === 'pengurus' && (
+                <button
+                  onClick={() => setIsAddOfficerModalOpen(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(0, 229, 255, 0.15)',
+                    border: '1px solid #00e5ff',
+                    color: '#00e5ff',
+                    fontSize: '10.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <UserPlus size={12} />
+                  <span>Tambah Pengurus</span>
+                </button>
+              )}
             </div>
 
-            {/* List */}
-            {selectedTerritory.children && selectedTerritory.children.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
-                {selectedTerritory.children.map((child) => (
-                  <div
-                    key={child.id}
-                    onClick={() => setSelectedTerritory(child)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '8px 12px',
-                      borderRadius: '6px',
-                      backgroundColor: '#060b13',
-                      border: '1px solid rgba(56, 189, 248, 0.1)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#ffffff' }}>
-                        {child.name}
-                      </div>
-                      <div style={{ fontSize: '10px', color: '#64748b' }}>
-                        {child.code} • {child.citizensCount.toLocaleString('id-ID')} Warga
-                      </div>
-                    </div>
+            {/* TAB 1: Sub-Wilayah Content */}
+            {activeTab === 'sub' && (
+              <div>
+                {selectedTerritory.children && selectedTerritory.children.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
+                    {selectedTerritory.children.map((child) => (
+                      <div
+                        key={child.id}
+                        onClick={() => setSelectedTerritory(child)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          backgroundColor: '#060b13',
+                          border: '1px solid rgba(56, 189, 248, 0.1)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#ffffff' }}>
+                            {child.name}
+                          </div>
+                          <div style={{ fontSize: '10px', color: '#64748b' }}>
+                            {child.code} • {child.citizensCount.toLocaleString('id-ID')} Warga
+                          </div>
+                        </div>
 
-                    <span style={{
-                      fontSize: '9px',
-                      fontWeight: 700,
-                      color: child.status === 'optimal' ? '#10b981' : '#f59e0b'
-                    }}>
-                      {child.status.toUpperCase()}
-                    </span>
+                        <span style={{
+                          fontSize: '9px',
+                          fontWeight: 700,
+                          color: child.status === 'optimal' ? '#10b981' : '#f59e0b'
+                        }}>
+                          {child.status.toUpperCase()}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '16px', color: '#64748b', fontSize: '11.5px' }}>
+                    Tidak ada sub-wilayah di bawah naungan {selectedTerritory.name}.
+                  </div>
+                )}
               </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '16px', color: '#64748b', fontSize: '11.5px' }}>
-                Tidak ada sub-wilayah di bawah naungan {selectedTerritory.name}.
+            )}
+
+            {/* TAB 2: Pengurus Content */}
+            {activeTab === 'pengurus' && (
+              <div>
+                {selectedTerritory.officers && selectedTerritory.officers.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
+                    {selectedTerritory.officers.map((off) => (
+                      <div
+                        key={off.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          backgroundColor: '#060b13',
+                          border: '1px solid rgba(56, 189, 248, 0.1)'
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#ffffff' }}>
+                              {off.name}
+                            </span>
+                            <span style={{
+                              fontSize: '9px',
+                              fontWeight: 700,
+                              color: '#38bdf8',
+                              backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                              padding: '1px 5px',
+                              borderRadius: '3px'
+                            }}>
+                              {off.position}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
+                            {off.phone} • {off.email}
+                          </div>
+                        </div>
+
+                        <span style={{
+                          fontSize: '9px',
+                          fontWeight: 700,
+                          color: '#10b981',
+                          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                          padding: '2px 6px',
+                          borderRadius: '4px'
+                        }}>
+                          AKTIF
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '16px', color: '#64748b', fontSize: '11.5px' }}>
+                    Belum ada data pengurus yang didaftarkan pada wilayah ini.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 3: Demografi & Android Warga Content */}
+            {activeTab === 'demografi' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{
+                  backgroundColor: '#060b13',
+                  border: '1px solid rgba(56, 189, 248, 0.12)',
+                  borderRadius: '8px',
+                  padding: '10px 12px'
+                }}>
+                  <div style={{ fontSize: '10px', color: '#94a3b8' }}>Kepala Keluarga (KK)</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff', marginTop: '2px' }}>
+                    {demo.totalKK.toLocaleString('id-ID')} KK
+                  </div>
+                  <div style={{ fontSize: '9.5px', color: '#64748b', marginTop: '4px' }}>
+                    Laki-laki: {demo.maleCount.toLocaleString('id-ID')} • Perempuan: {demo.femaleCount.toLocaleString('id-ID')}
+                  </div>
+                </div>
+
+                <div style={{
+                  backgroundColor: '#060b13',
+                  border: '1px solid rgba(56, 189, 248, 0.12)',
+                  borderRadius: '8px',
+                  padding: '10px 12px'
+                }}>
+                  <div style={{ fontSize: '10px', color: '#94a3b8' }}>Adopsi Aplikasi Android Warga</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#00e5ff', marginTop: '2px' }}>
+                    {demo.appAdoptionPercentage}%
+                  </div>
+                  <div style={{ fontSize: '9.5px', color: '#10b981', marginTop: '4px' }}>
+                    {demo.verifiedWargaCount.toLocaleString('id-ID')} Warga Terverifikasi
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -518,6 +777,14 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
         onClose={() => setIsEditModalOpen(false)}
         territory={selectedTerritory}
         onSave={handleSaveEditTerritory}
+      />
+
+      {/* Add Officer Modal */}
+      <AddOfficerModal
+        isOpen={isAddOfficerModalOpen}
+        onClose={() => setIsAddOfficerModalOpen(false)}
+        territoryName={selectedTerritory.name}
+        onSave={handleSaveOfficer}
       />
     </div>
   );

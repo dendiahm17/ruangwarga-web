@@ -11,6 +11,42 @@ export const mockTerritoryHierarchy: TerritoryItem = {
   workspacesCount: 120654,
   leaderName: 'Dewan Tata Kelola Nasional',
   leaderPhone: '+62 21 555 0100',
+  demographics: {
+    totalKK: 712000,
+    maleCount: 1420000,
+    femaleCount: 1427592,
+    appAdoptionPercentage: 68.4,
+    verifiedWargaCount: 2420000
+  },
+  officers: [
+    {
+      id: 'off-01',
+      name: 'Dr. H. Arya Pratama, M.Sc',
+      position: 'Ketua',
+      phone: '+62 21 555 0101',
+      email: 'ketua.nasional@ruangwarga.id',
+      status: 'active',
+      registeredAt: '01 Jan 2024'
+    },
+    {
+      id: 'off-02',
+      name: 'Rina Kusumawardani, S.Kom',
+      position: 'Sekretaris',
+      phone: '+62 21 555 0102',
+      email: 'sekretaris.nasional@ruangwarga.id',
+      status: 'active',
+      registeredAt: '01 Jan 2024'
+    },
+    {
+      id: 'off-03',
+      name: 'Bambang Trihatmojo, S.E',
+      position: 'Bendahara',
+      phone: '+62 21 555 0103',
+      email: 'bendahara.nasional@ruangwarga.id',
+      status: 'active',
+      registeredAt: '01 Jan 2024'
+    }
+  ],
   children: [
     {
       id: 'jabar',
@@ -24,6 +60,33 @@ export const mockTerritoryHierarchy: TerritoryItem = {
       workspacesCount: 34120,
       leaderName: 'H. Ridwan Setiawan, M.Si',
       leaderPhone: '+62 22 710 4421',
+      demographics: {
+        totalKK: 210500,
+        maleCount: 420000,
+        femaleCount: 422100,
+        appAdoptionPercentage: 74.2,
+        verifiedWargaCount: 710000
+      },
+      officers: [
+        {
+          id: 'off-jabar-1',
+          name: 'H. Ridwan Setiawan, M.Si',
+          position: 'Ketua',
+          phone: '+62 22 710 4421',
+          email: 'pembina.jabar@ruangwarga.id',
+          status: 'active',
+          registeredAt: '15 Mar 2024'
+        },
+        {
+          id: 'off-jabar-2',
+          name: 'Ahmad Sofyan, S.STP',
+          position: 'Sekretaris',
+          phone: '+62 22 710 4422',
+          email: 'sekretariat.jabar@ruangwarga.id',
+          status: 'active',
+          registeredAt: '15 Mar 2024'
+        }
+      ],
       children: [
         {
           id: 'kab-bogor',
@@ -37,6 +100,24 @@ export const mockTerritoryHierarchy: TerritoryItem = {
           workspacesCount: 8920,
           leaderName: 'Dr. Hj. Ade Yasin, M.H',
           leaderPhone: '+62 251 832 1100',
+          demographics: {
+            totalKK: 53850,
+            maleCount: 107000,
+            femaleCount: 108400,
+            appAdoptionPercentage: 78.5,
+            verifiedWargaCount: 185000
+          },
+          officers: [
+            {
+              id: 'off-bogor-1',
+              name: 'Dr. Hj. Ade Yasin, M.H',
+              position: 'Ketua',
+              phone: '+62 251 832 1100',
+              email: 'bupati.bogor@ruangwarga.id',
+              status: 'active',
+              registeredAt: '10 Apr 2024'
+            }
+          ],
           children: [
             {
               id: 'kec-cibinong',
@@ -50,6 +131,13 @@ export const mockTerritoryHierarchy: TerritoryItem = {
               workspacesCount: 1940,
               leaderName: 'Drs. Rusliandy, M.Si',
               leaderPhone: '+62 251 875 3290',
+              demographics: {
+                totalKK: 12050,
+                maleCount: 24000,
+                femaleCount: 24200,
+                appAdoptionPercentage: 82.1,
+                verifiedWargaCount: 42000
+              },
               children: [
                 {
                   id: 'kel-sukamaju',
@@ -63,6 +151,13 @@ export const mockTerritoryHierarchy: TerritoryItem = {
                   workspacesCount: 380,
                   leaderName: 'Budi Santoso, S.STP',
                   leaderPhone: '+62 812 3344 5566',
+                  demographics: {
+                    totalKK: 3110,
+                    maleCount: 6200,
+                    femaleCount: 6250,
+                    appAdoptionPercentage: 86.4,
+                    verifiedWargaCount: 11200
+                  },
                   children: [
                     {
                       id: 'rw-02',
@@ -76,6 +171,51 @@ export const mockTerritoryHierarchy: TerritoryItem = {
                       workspacesCount: 8,
                       leaderName: 'H. Agus Permana',
                       leaderPhone: '+62 813 9988 7766',
+                      demographics: {
+                        totalKK: 462,
+                        maleCount: 920,
+                        femaleCount: 930,
+                        appAdoptionPercentage: 92.5,
+                        verifiedWargaCount: 1720
+                      },
+                      officers: [
+                        {
+                          id: 'off-rw02-1',
+                          name: 'H. Agus Permana',
+                          position: 'Ketua',
+                          phone: '+62 813 9988 7766',
+                          email: 'ketua.rw02@ruangwarga.id',
+                          status: 'active',
+                          registeredAt: '12 Jan 2025'
+                        },
+                        {
+                          id: 'off-rw02-2',
+                          name: 'Drs. Supriyadi',
+                          position: 'Sekretaris',
+                          phone: '+62 812 4455 6677',
+                          email: 'sekretaris.rw02@ruangwarga.id',
+                          status: 'active',
+                          registeredAt: '12 Jan 2025'
+                        },
+                        {
+                          id: 'off-rw02-3',
+                          name: 'Hj. Siti Aminah',
+                          position: 'Bendahara',
+                          phone: '+62 818 1122 3344',
+                          email: 'bendahara.rw02@ruangwarga.id',
+                          status: 'active',
+                          registeredAt: '15 Jan 2025'
+                        },
+                        {
+                          id: 'off-rw02-4',
+                          name: 'Kopda (Purn) M. Yasin',
+                          position: 'Seksi Keamanan',
+                          phone: '+62 819 5566 7788',
+                          email: 'keamanan.rw02@ruangwarga.id',
+                          status: 'active',
+                          registeredAt: '20 Jan 2025'
+                        }
+                      ],
                       children: [
                         {
                           id: 'rt-01',
@@ -88,7 +228,25 @@ export const mockTerritoryHierarchy: TerritoryItem = {
                           citizensCount: 240,
                           workspacesCount: 1,
                           leaderName: 'Ahmad Fauzi',
-                          leaderPhone: '+62 815 1122 3344'
+                          leaderPhone: '+62 815 1122 3344',
+                          demographics: {
+                            totalKK: 60,
+                            maleCount: 118,
+                            femaleCount: 122,
+                            appAdoptionPercentage: 95.0,
+                            verifiedWargaCount: 230
+                          },
+                          officers: [
+                            {
+                              id: 'off-rt01-1',
+                              name: 'Ahmad Fauzi',
+                              position: 'Ketua',
+                              phone: '+62 815 1122 3344',
+                              email: 'rt01.rw02@ruangwarga.id',
+                              status: 'active',
+                              registeredAt: '15 Jan 2025'
+                            }
+                          ]
                         },
                         {
                           id: 'rt-02',
@@ -101,7 +259,14 @@ export const mockTerritoryHierarchy: TerritoryItem = {
                           citizensCount: 280,
                           workspacesCount: 1,
                           leaderName: 'Bambang Supriyanto',
-                          leaderPhone: '+62 816 2233 4455'
+                          leaderPhone: '+62 816 2233 4455',
+                          demographics: {
+                            totalKK: 70,
+                            maleCount: 135,
+                            femaleCount: 145,
+                            appAdoptionPercentage: 62.0,
+                            verifiedWargaCount: 210
+                          }
                         },
                         {
                           id: 'rt-03',
@@ -114,7 +279,14 @@ export const mockTerritoryHierarchy: TerritoryItem = {
                           citizensCount: 210,
                           workspacesCount: 1,
                           leaderName: 'Hendra Gunawan',
-                          leaderPhone: '+62 817 3344 5566'
+                          leaderPhone: '+62 817 3344 5566',
+                          demographics: {
+                            totalKK: 52,
+                            maleCount: 102,
+                            femaleCount: 108,
+                            appAdoptionPercentage: 88.0,
+                            verifiedWargaCount: 195
+                          }
                         }
                       ]
                     },
