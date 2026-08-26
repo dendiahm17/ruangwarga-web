@@ -3,6 +3,8 @@ import type { TerritoryItem } from '../core/types/territory.types';
 import { mockTerritoryHierarchy } from '../services/mock/mockTerritoryData';
 import { TerritoryTreeNode } from '../components/territory/TerritoryTreeNode';
 import { CreateTerritoryModal } from '../components/territory/CreateTerritoryModal';
+import { EditTerritoryModal } from '../components/territory/EditTerritoryModal';
+import { useScope } from '../context/ScopeContext';
 import { 
   Network, 
   Search, 
@@ -13,7 +15,12 @@ import {
   Phone, 
   MapPin, 
   AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  Edit3,
+  Globe2,
+  CheckCircle2,
+  ListTree,
+  UserCheck
 } from 'lucide-react';
 
 interface WilayahPageProps {
@@ -21,11 +28,22 @@ interface WilayahPageProps {
 }
 
 export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace }) => {
+  const { setScopeById } = useScope();
   const [rootData, setRootData] = useState<TerritoryItem>(mockTerritoryHierarchy);
   const [selectedTerritory, setSelectedTerritory] = useState<TerritoryItem>(mockTerritoryHierarchy);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [tierFilter, setTierFilter] = useState<string>('Semua');
+  const [activeTab, setActiveTab] = useState<'sub' | 'pengurus'>('sub');
+  
+  // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [parentTarget, setParentTarget] = useState<TerritoryItem | null>(null);
+
+  // Set territory as active scope in the whole platform
+  const handleSetActiveScope = () => {
+    setScopeById(selectedTerritory.id);
+  };
 
   const handleAddSubTerritory = (parent: TerritoryItem) => {
     setParentTarget(parent);
@@ -43,11 +61,10 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
       citizensCount: 0,
       workspacesCount: 0,
       childrenCount: 0,
-      leaderName: newTerritory.leaderName || '-',
+      leaderName: newTerritory.leaderName || 'Belum Ditetapkan',
       leaderPhone: newTerritory.leaderPhone || '-'
     };
 
-    // Deep clone and insert recursively
     const insertRecursive = (node: TerritoryItem): TerritoryItem => {
       if (node.id === newItem.parentId) {
         return {
@@ -69,6 +86,30 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
     setRootData(updatedRoot);
     setSelectedTerritory(newItem);
   };
+
+  const handleSaveEditTerritory = (updated: Partial<TerritoryItem>) => {
+    const updateRecursive = (node: TerritoryItem): TerritoryItem => {
+      if (node.id === updated.id) {
+        return {
+          ...node,
+          ...updated
+        };
+      }
+      if (node.children) {
+        return {
+          ...node,
+          children: node.children.map(updateRecursive)
+        };
+      }
+      return node;
+    };
+
+    const updatedRoot = updateRecursive(rootData);
+    setRootData(updatedRoot);
+    setSelectedTerritory(prev => ({ ...prev, ...updated }));
+  };
+
+  const tiersList = ['Semua', 'Provinsi', 'Kab/Kota', 'Kecamatan', 'Desa/Kel', 'RW', 'RT'];
 
   return (
     <div style={{
@@ -96,42 +137,44 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
             </h1>
           </div>
           <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '3px' }}>
-            Struktur administrasi nasional berbasis wilayah: Negara → Provinsi → Kab/Kota → Kecamatan → Desa/Kelurahan → RW → RT
+            Struktur administrasi tata kelola nasional: Negara → Provinsi → Kab/Kota → Kecamatan → Desa/Kelurahan → RW → RT
           </p>
         </div>
 
         {/* Global Action */}
-        <button
-          onClick={() => handleAddSubTerritory(selectedTerritory)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: 'rgba(0, 229, 255, 0.15)',
-            border: '1px solid #00e5ff',
-            borderRadius: '8px',
-            padding: '8px 14px',
-            color: '#00e5ff',
-            fontSize: '12px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 0 12px rgba(0, 229, 255, 0.25)'
-          }}
-        >
-          <Plus size={15} />
-          <span>Tambah Sub-Wilayah</span>
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => handleAddSubTerritory(selectedTerritory)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: 'rgba(0, 229, 255, 0.15)',
+              border: '1px solid #00e5ff',
+              borderRadius: '8px',
+              padding: '8px 14px',
+              color: '#00e5ff',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 0 12px rgba(0, 229, 255, 0.25)'
+            }}
+          >
+            <Plus size={15} />
+            <span>Tambah Sub-Wilayah</span>
+          </button>
+        </div>
       </div>
 
       {/* 2-Column Layout: Territory Tree (Left) + Territory Detail (Right) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
+        gridTemplateColumns: 'minmax(0, 1.3fr) minmax(0, 1.1fr)',
         gap: '20px'
       }}>
         {/* Left Column: Interactive Tree Explorer */}
-        <div className="futuristic-card" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '600px' }}>
-          {/* Header & Search */}
+        <div className="futuristic-card" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '640px' }}>
+          {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span className="futuristic-card-title">POHON HIERARKI WILAYAH</span>
             <span style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 700 }}>
@@ -164,8 +207,30 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
             />
           </div>
 
+          {/* Level Filter Pills */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            {tiersList.map((t) => (
+              <button
+                key={t}
+                onClick={() => setTierFilter(t)}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  border: tierFilter === t ? '1px solid #00e5ff' : '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: tierFilter === t ? 'rgba(0, 229, 255, 0.15)' : 'transparent',
+                  color: tierFilter === t ? '#00e5ff' : '#94a3b8',
+                  fontSize: '10.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
           {/* Tree View Scroll Area */}
-          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', marginTop: '6px' }}>
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', marginTop: '4px' }}>
             <TerritoryTreeNode
               item={rootData}
               selectedId={selectedTerritory.id}
@@ -175,10 +240,11 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
           </div>
         </div>
 
-        {/* Right Column: Selected Territory Detail Card */}
+        {/* Right Column: Selected Territory Detail Card & Sub-tabs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Detail Card */}
           <div className="futuristic-card" style={{ padding: '20px' }}>
+            {/* Header with Edit Button & Set as Scope */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
               <div>
                 <span style={{
@@ -197,22 +263,55 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                   {selectedTerritory.name}
                 </h2>
                 <div style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace', marginTop: '2px' }}>
-                  Kode Wilayah: {selectedTerritory.code}
+                  Kode Administrasi: {selectedTerritory.code}
                 </div>
               </div>
 
-              {/* Status Badge */}
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                color: selectedTerritory.status === 'optimal' ? '#10b981' : '#f59e0b',
-                backgroundColor: selectedTerritory.status === 'optimal' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                border: `1px solid ${selectedTerritory.status === 'optimal' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
-                padding: '3px 8px',
-                borderRadius: '6px'
-              }}>
-                Status: {selectedTerritory.status.toUpperCase()}
-              </span>
+              {/* Edit & Set Scope buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  title="Edit Data Wilayah"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: '#0a1220',
+                    border: '1px solid rgba(56, 189, 248, 0.25)',
+                    borderRadius: '6px',
+                    padding: '5px 10px',
+                    color: '#38bdf8',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Edit3 size={13} />
+                  <span>Edit</span>
+                </button>
+
+                <button
+                  onClick={handleSetActiveScope}
+                  title="Jadikan Scope Aktif Platform"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid #10b981',
+                    borderRadius: '6px',
+                    padding: '5px 10px',
+                    color: '#10b981',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 0 10px rgba(16, 185, 129, 0.2)'
+                  }}
+                >
+                  <Globe2 size={13} />
+                  <span>Set Sebagai Scope</span>
+                </button>
+              </div>
             </div>
 
             {/* 3 Metric Summary Boxes */}
@@ -257,11 +356,11 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
               </div>
             </div>
 
-            {/* Administration & Governance Info */}
+            {/* Governance Details */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
+              gap: '9px',
               backgroundColor: 'rgba(15, 23, 42, 0.5)',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               borderRadius: '8px',
@@ -278,12 +377,18 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                 <span style={{ color: '#38bdf8', fontWeight: 600 }}>{selectedTerritory.leaderPhone}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#94a3b8' }}>ID Scope Sistem</span>
-                <span style={{ fontFamily: 'monospace', color: '#64748b' }}>{selectedTerritory.id}</span>
+                <span style={{ color: '#94a3b8' }}>Status Wilayah</span>
+                <span style={{
+                  color: selectedTerritory.status === 'optimal' ? '#10b981' : '#f59e0b',
+                  fontWeight: 700,
+                  textTransform: 'uppercase'
+                }}>
+                  {selectedTerritory.status}
+                </span>
               </div>
             </div>
 
-            {/* Actions for this Territory */}
+            {/* Action Bar */}
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => handleAddSubTerritory(selectedTerritory)}
@@ -326,19 +431,93 @@ export const WilayahPage: React.FC<WilayahPageProps> = ({ onNavigateWorkspace })
                 }}
               >
                 <Layers size={14} />
-                <span>Lihat Workspace</span>
+                <span>Buka Workspace</span>
               </button>
             </div>
+          </div>
+
+          {/* Sub-Territories List / Table */}
+          <div className="futuristic-card" style={{ padding: '18px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px', marginBottom: '12px' }}>
+              <button
+                onClick={() => setActiveTab('sub')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: activeTab === 'sub' ? '#00e5ff' : '#94a3b8',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <ListTree size={14} />
+                <span>Daftar Sub-Wilayah ({selectedTerritory.children?.length || 0})</span>
+              </button>
+            </div>
+
+            {/* List */}
+            {selectedTerritory.children && selectedTerritory.children.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
+                {selectedTerritory.children.map((child) => (
+                  <div
+                    key={child.id}
+                    onClick={() => setSelectedTerritory(child)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      backgroundColor: '#060b13',
+                      border: '1px solid rgba(56, 189, 248, 0.1)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#ffffff' }}>
+                        {child.name}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#64748b' }}>
+                        {child.code} • {child.citizensCount.toLocaleString('id-ID')} Warga
+                      </div>
+                    </div>
+
+                    <span style={{
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      color: child.status === 'optimal' ? '#10b981' : '#f59e0b'
+                    }}>
+                      {child.status.toUpperCase()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '16px', color: '#64748b', fontSize: '11.5px' }}>
+                Tidak ada sub-wilayah di bawah naungan {selectedTerritory.name}.
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Create Territory Modal */}
+      {/* Create Sub-Territory Modal */}
       <CreateTerritoryModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         parentTerritory={parentTarget}
         onSave={handleSaveSubTerritory}
+      />
+
+      {/* Edit Territory Modal */}
+      <EditTerritoryModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        territory={selectedTerritory}
+        onSave={handleSaveEditTerritory}
       />
     </div>
   );
