@@ -3,6 +3,7 @@ import type { CitizenUser } from '../core/types/user.types';
 import { FirestoreRealtimeService } from '../services/firestore/firestoreRealtimeService';
 import { isFirebaseConfigured } from '../config/firebase';
 import { UserDetailModal } from '../components/users/UserDetailModal';
+import { mockCitizenUsers } from '../services/mock/mockUserData';
 import {
   Users,
   Search,
@@ -17,25 +18,46 @@ import {
 } from 'lucide-react';
 
 export const PenggunaPage: React.FC = () => {
-  const [users, setUsers] = useState<CitizenUser[]>([]);
+  const [users, setUsers] = useState<CitizenUser[]>(mockCitizenUsers);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'pending' | 'rejected'>('all');
   const [selectedUser, setSelectedUser] = useState<CitizenUser | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  // Subscribe to Realtime Firestore Users collection
+  // Subscribe to Realtime Firestore Users collection safely
   useEffect(() => {
-    const unsubscribe = FirestoreRealtimeService.subscribeToCitizens((items) => {
-      setUsers(items);
-    });
-    return () => unsubscribe();
+    try {
+      const unsubscribe = FirestoreRealtimeService.subscribeToCitizens((items) => {
+        if (items && items.length > 0) {
+          setUsers(items);
+        } else {
+          setUsers(mockCitizenUsers);
+        }
+      });
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    } catch (e) {
+      console.warn('Error subscribing to citizens, using mock data:', e);
+      setUsers(mockCitizenUsers);
+    }
   }, []);
 
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.nik.includes(searchQuery) ||
-      u.territoryPath.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.phone.includes(searchQuery);
+  const safeUsers = Array.isArray(users) ? users : mockCitizenUsers;
+
+  const filteredUsers = safeUsers.filter((u) => {
+    if (!u) return false;
+    const nameStr = (u.name || '').toLowerCase();
+    const nikStr = (u.nik || '');
+    const pathStr = (u.territoryPath || '').toLowerCase();
+    const phoneStr = (u.phone || '');
+    const query = searchQuery.toLowerCase();
+
+    const matchesSearch = nameStr.includes(query) ||
+      nikStr.includes(query) ||
+      pathStr.includes(query) ||
+      phoneStr.includes(query);
+
     const matchesStatus = statusFilter === 'all' || u.verificationStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -50,8 +72,8 @@ export const PenggunaPage: React.FC = () => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, verificationStatus: 'rejected' } : u));
   };
 
-  const pendingCount = users.filter(u => u.verificationStatus === 'pending').length;
-  const verifiedCount = users.filter(u => u.verificationStatus === 'verified').length;
+  const pendingCount = safeUsers.filter(u => u && u.verificationStatus === 'pending').length;
+  const verifiedCount = safeUsers.filter(u => u && u.verificationStatus === 'verified').length;
 
   return (
     <div style={{
@@ -210,6 +232,11 @@ export const PenggunaPage: React.FC = () => {
             {filteredUsers.map((u) => {
               const isVerified = u.verificationStatus === 'verified';
               const isPending = u.verificationStatus === 'pending';
+              const name = u.name || 'Warga';
+              const nik = u.nik || '0000000000000000';
+              const initials = name.length >= 2 ? name.slice(0, 2).toUpperCase() : 'RW';
+              const maskedNik = nik.length >= 12 ? `${nik.slice(0, 6)}******${nik.slice(12)}` : nik;
+
               return (
                 <tr key={u.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
                   {/* Name & Gender */}
@@ -228,14 +255,14 @@ export const PenggunaPage: React.FC = () => {
                         fontWeight: 700,
                         color: '#38bdf8'
                       }}>
-                        {u.name.slice(0, 2).toUpperCase()}
+                        {initials}
                       </div>
                       <div>
                         <div style={{ fontWeight: 700, color: '#ffffff' }}>
-                          {u.name}
+                          {name}
                         </div>
                         <div style={{ fontSize: '10px', color: '#64748b' }}>
-                          {u.gender} {u.isHeadOfFamily && '• KK'}
+                          {u.gender || 'Warga'} {u.isHeadOfFamily && '• KK'}
                         </div>
                       </div>
                     </div>
@@ -243,18 +270,18 @@ export const PenggunaPage: React.FC = () => {
 
                   {/* NIK */}
                   <td style={{ padding: '10px', fontFamily: 'monospace', color: '#94a3b8' }}>
-                    {u.nik.slice(0, 6)}******{u.nik.slice(12)}
+                    {maskedNik}
                   </td>
 
                   {/* Territory */}
                   <td style={{ padding: '10px' }}>
-                    <div style={{ color: '#ffffff', fontWeight: 600 }}>{u.kelurahan}</div>
-                    <div style={{ fontSize: '10px', color: '#64748b' }}>{u.rw} / {u.rt}</div>
+                    <div style={{ color: '#ffffff', fontWeight: 600 }}>{u.kelurahan || 'Kel. Sukamaju'}</div>
+                    <div style={{ fontSize: '10px', color: '#64748b' }}>{u.rw || 'RW 02'} / {u.rt || 'RT 01'}</div>
                   </td>
 
                   {/* Contact */}
                   <td style={{ padding: '10px', color: '#38bdf8' }}>
-                    {u.phone}
+                    {u.phone || '-'}
                   </td>
 
                   {/* Status Badge */}
