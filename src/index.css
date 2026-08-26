@@ -3,44 +3,52 @@
 :root {
   --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  /* Brand Theme Colors */
-  --sidebar-bg: #071912;
-  --sidebar-darker: #04100b;
-  --sidebar-hover: rgba(255, 255, 255, 0.05);
-  --sidebar-border: #0f2d22;
-  --sidebar-text: #8faea2;
-  --sidebar-text-active: #ffffff;
-  --sidebar-accent: #10b981;
-  --sidebar-accent-hover: #059669;
-
-  /* App Canvas */
-  --canvas-bg: #f4f6f9;
-  --panel-bg: #ffffff;
-  --panel-border: #e2e8f0;
-  --panel-border-focus: #cbd5e1;
+  /* Futuristic Dark Mode Canvas */
+  --bg-canvas: #060b13;
+  --bg-sidebar: #05080f;
+  --bg-header: rgba(6, 11, 19, 0.85);
+  --bg-surface: #0a1120;
+  --bg-surface-elevated: #0e182c;
+  --bg-surface-translucent: rgba(10, 17, 32, 0.75);
+  --bg-surface-card: #091222;
   
-  /* Typography */
-  --text-main: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #64748b;
-  --text-subtle: #94a3b8;
+  /* Neon Brand Accents */
+  --neon-cyan: #00e5ff;
+  --neon-cyan-glow: rgba(0, 229, 255, 0.25);
+  --neon-cyan-soft: rgba(0, 229, 255, 0.12);
+  --neon-blue: #38bdf8;
+  --neon-blue-glow: rgba(56, 189, 248, 0.25);
   
-  /* Status & Accents */
-  --status-good: #10b981;
-  --status-good-bg: #ecfdf5;
+  /* Status Colors */
+  --status-optimal: #10b981;
+  --status-optimal-glow: rgba(16, 185, 129, 0.2);
+  --status-optimal-soft: rgba(16, 185, 129, 0.12);
+  
   --status-warning: #f59e0b;
-  --status-warning-bg: #fffbeb;
-  --status-danger: #ef4444;
-  --status-danger-bg: #fef2f2;
-  --status-info: #3b82f6;
-  --status-info-bg: #eff6ff;
-  --status-purple: #8b5cf6;
-  --status-purple-bg: #f5f3ff;
+  --status-warning-glow: rgba(245, 158, 11, 0.2);
+  --status-warning-soft: rgba(245, 158, 11, 0.12);
+  
+  --status-critical: #ef4444;
+  --status-critical-glow: rgba(239, 68, 68, 0.25);
+  --status-critical-soft: rgba(239, 68, 68, 0.15);
+  
+  --neon-purple: #a855f7;
+  --neon-purple-soft: rgba(168, 85, 247, 0.12);
 
-  /* Professional Layered Shadow */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.02);
+  /* Typography */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-cyan: #38bdf8;
+  
+  /* Borders & Shadows */
+  --border-subtle: rgba(56, 189, 248, 0.12);
+  --border-card: #132238;
+  --border-active: rgba(0, 229, 255, 0.4);
+  --panel-radius: 12px;
+  
+  --glow-panel: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --glow-active: 0 0 16px rgba(0, 229, 255, 0.25);
 }
 
 * {
@@ -51,8 +59,8 @@
 
 body {
   font-family: var(--font-main);
-  background-color: var(--canvas-bg);
-  color: var(--text-main);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -64,31 +72,34 @@ body {
   flex-direction: column;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar Dark */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #060b13;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #1e293b;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #38bdf8;
 }
 
-/* Layout classes */
+/* App Shell */
 .app-container {
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background-color: var(--canvas-bg);
+  background-color: var(--bg-canvas);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(0, 229, 255, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.02) 0%, transparent 40%);
 }
 
 .main-content {
@@ -100,76 +111,44 @@ body {
   max-height: 100vh;
 }
 
-.panel-card {
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
-  padding: 18px 20px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+/* Futuristic Card */
+.futuristic-card {
+  background: var(--bg-surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--glow-panel);
+  position: relative;
+  transition: all 0.2s ease;
 }
 
-.panel-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: #cbd5e1;
+.futuristic-card:hover {
+  border-color: rgba(56, 189, 248, 0.28);
 }
 
-.panel-title {
-  font-size: 12.5px;
+.futuristic-card-title {
+  font-size: 11px;
   font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
   text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.panel-subtitle {
-  font-size: 11px;
-  color: #64748b;
-  margin-top: 2px;
-  line-height: 1.35;
+/* Radar Animation */
+@keyframes radarPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 10px #00e5ff); }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Utility tags */
-.badge-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+@keyframes beaconGlow {
+  0% { r: 3; opacity: 1; }
+  50% { r: 7; opacity: 0.4; }
+  100% { r: 3; opacity: 1; }
 }
 
-.badge-green {
-  background-color: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-}
-
-.badge-yellow {
-  background-color: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fde68a;
-}
-
-.badge-red {
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-
-.badge-blue {
-  background-color: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-}
-
-.badge-purple {
-  background-color: #f5f3ff;
-  color: #5b21b6;
-  border: 1px solid #ddd6fe;
+.animate-radar {
+  animation: radarPulse 4s infinite ease-in-out;
 }

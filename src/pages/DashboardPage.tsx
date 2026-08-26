@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useScope } from '../context/ScopeContext';
-import { useAuth } from '../context/AuthContext';
 import { dashboardService } from '../services';
 
-import { ScopeInfoPanel } from '../components/dashboard/ScopeInfoPanel';
-import { IndonesiaMapPanel } from '../components/dashboard/IndonesiaMapPanel';
-import { NationalSummaryPanel } from '../components/dashboard/NationalSummaryPanel';
-import { SystemTasksPanel } from '../components/dashboard/SystemTasksPanel';
-import { AlarmEventsPanel } from '../components/dashboard/AlarmEventsPanel';
-import { ActivityTrendPanel } from '../components/dashboard/ActivityTrendPanel';
-import { AccessPermissionPanel } from '../components/dashboard/AccessPermissionPanel';
-import { PriorityRegionsTable } from '../components/dashboard/PriorityRegionsTable';
-import { WorkspaceDistributionPanel } from '../components/dashboard/WorkspaceDistributionPanel';
-import { RecentActivityFeed } from '../components/dashboard/RecentActivityFeed';
-import { QuickActionsPanel } from '../components/dashboard/QuickActionsPanel';
-import { PhilosophyFooter } from '../components/dashboard/PhilosophyFooter';
+import { CurrentScopeCard } from '../components/scope/CurrentScopeCard';
+import { PlatformSummaryCards } from '../components/summary/PlatformSummaryCards';
+import { MonitoringWilayahPanel } from '../components/monitoring/MonitoringWilayahPanel';
+import { WorkspaceSection } from '../components/workspace/WorkspaceSection';
+import { WawasanPlatformPanel } from '../components/insights/WawasanPlatformPanel';
+import { SystemTasksPanel } from '../components/tasks/SystemTasksPanel';
+import { PerhatianKhususPanel } from '../components/alerts/PerhatianKhususPanel';
+import { AktivitasSistemTimeline } from '../components/activity/AktivitasSistemTimeline';
 
-import { 
-  DashboardMetrics, 
-  SystemTask, 
-  SystemAlarm, 
-  PriorityRegion, 
-  WorkspaceDistribution, 
-  RealtimeActivity 
+import type {
+  PlatformSummaryMetrics,
+  MonitoringWilayahData,
+  SystemTaskItem,
+  SpecialAttentionItem,
+  WorkspaceTierItem,
+  RealtimeActivityItem,
+  PlatformInsightsData
 } from '../core/types/dashboard.types';
 
 interface DashboardPageProps {
@@ -32,65 +28,61 @@ interface DashboardPageProps {
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScopeModal, onNavigate }) => {
   const { currentScope } = useScope();
-  const { user } = useAuth();
 
-  const [metrics, setMetrics] = useState<DashboardMetrics>(() => ({
-    totalWorkspace: { value: '120.654', change: '+2,06%', isPositive: true },
-    totalWargaAktif: { value: '25.684.112', change: '+1,37%', isPositive: true },
-    totalAktivitas: { value: '184.932', change: '+7,44%', isPositive: true },
-    laporanMasuk: { value: '5.432', change: '+11,11%', isPositive: false },
-    tingkatRespons: { value: '92,7%', change: '+3,4%', isPositive: true },
-    kegiatanSelesai: { value: '14.287', change: '+6,7%', isPositive: true },
-  }));
-  const [tasks, setTasks] = useState<SystemTask[]>([]);
-  const [alarms, setAlarms] = useState<SystemAlarm[]>([]);
-  const [regions, setRegions] = useState<PriorityRegion[]>([]);
-  const [distributions, setDistributions] = useState<WorkspaceDistribution[]>([]);
-  const [activities, setActivities] = useState<RealtimeActivity[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [summary, setSummary] = useState<PlatformSummaryMetrics | null>(null);
+  const [monitoring, setMonitoring] = useState<MonitoringWilayahData | null>(null);
+  const [tasks, setTasks] = useState<SystemTaskItem[]>([]);
+  const [attentions, setAttentions] = useState<SpecialAttentionItem[]>([]);
+  const [workspaces, setWorkspaces] = useState<WorkspaceTierItem[]>([]);
+  const [activities, setActivities] = useState<RealtimeActivityItem[]>([]);
+  const [insights, setInsights] = useState<PlatformInsightsData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const loadDashboard = async () => {
       setLoading(true);
       try {
-        const [m, t, a, r, d, act] = await Promise.all([
-          dashboardService.getDashboardMetrics(currentScope.id),
+        const [sum, mon, t, att, ws, act, ins] = await Promise.all([
+          dashboardService.getSummaryMetrics(currentScope.id),
+          dashboardService.getMonitoringData(currentScope.id),
           dashboardService.getSystemTasks(currentScope.id),
-          dashboardService.getSystemAlarms(currentScope.id),
-          dashboardService.getPriorityRegions(currentScope.id),
-          dashboardService.getWorkspaceDistributions(currentScope.id),
-          dashboardService.getRecentActivities(currentScope.id)
+          dashboardService.getSpecialAttentions(currentScope.id),
+          dashboardService.getWorkspaceTiers(currentScope.id),
+          dashboardService.getRealtimeActivities(currentScope.id),
+          dashboardService.getPlatformInsights(currentScope.id)
         ]);
 
-        setMetrics(m);
+        setSummary(sum);
+        setMonitoring(mon);
         setTasks(t);
-        setAlarms(a);
-        setRegions(r);
-        setDistributions(d);
+        setAttentions(att);
+        setWorkspaces(ws);
         setActivities(act);
+        setInsights(ins);
       } catch (err) {
-        console.error('Error loading dashboard data:', err);
+        console.error('Error loading dashboard:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    loadDashboardData();
+    loadDashboard();
   }, [currentScope.id]);
 
-  if (loading || !metrics) {
+  if (loading || !summary || !monitoring || !insights) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80vh', color: '#64748b' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80vh', color: '#38bdf8' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <div style={{
             width: '32px',
             height: '32px',
             borderRadius: '50%',
-            border: '3px solid #cbd5e1',
-            borderTopColor: '#10b981',
-            animation: 'spin 0.8s linear infinite'
+            border: '3px solid rgba(0, 229, 255, 0.2)',
+            borderTopColor: '#00e5ff',
+            animation: 'spin 0.8s linear infinite',
+            boxShadow: '0 0 10px rgba(0, 229, 255, 0.4)'
           }} />
-          <span style={{ fontSize: '13px', fontWeight: 500 }}>Memuat Data Control Center...</span>
+          <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.04em' }}>Memuat Control Center RuangWarga...</span>
         </div>
       </div>
     );
@@ -98,54 +90,62 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScopeModal, 
 
   return (
     <div style={{
-      display: 'flex',
-      flexDirection: 'column',
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1fr) 340px',
       gap: '16px',
       padding: '20px 24px 32px 24px',
-      maxWidth: '1600px',
+      maxWidth: '1720px',
       margin: '0 auto',
       width: '100%'
     }}>
-      {/* ROW 1: Scope Info + Peta Wilayah + Ringkasan Nasional */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '240px 1.4fr 1.6fr',
-        gap: '16px',
-        minHeight: '260px'
-      }}>
-        <ScopeInfoPanel onOpenModal={onOpenScopeModal} />
-        <IndonesiaMapPanel />
-        <NationalSummaryPanel metrics={metrics} />
+      {/* LEFT & CENTER REGION (2fr) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
+        {/* ROW 1: Current Scope Card (with 3D Hologram Radar) + Platform Summary (4 KPI tiles) */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '320px minmax(0, 1fr)',
+          gap: '16px'
+        }}>
+          <CurrentScopeCard onOpenModal={onOpenScopeModal} />
+          <PlatformSummaryCards metrics={summary} />
+        </div>
+
+        {/* ROW 2: Panel Besar Monitoring Wilayah */}
+        <MonitoringWilayahPanel
+          data={monitoring}
+          onViewDetails={() => onNavigate?.('/wilayah')}
+        />
+
+        {/* ROW 3: Section Workspace (6 Tier Cards) */}
+        <WorkspaceSection
+          workspaces={workspaces}
+          onViewWorkspace={(id) => onNavigate?.(`/workspace`)}
+        />
+
+        {/* ROW 4: Section Wawasan Platform (Donuts, Gauges & Rating) */}
+        <WawasanPlatformPanel insights={insights} />
       </div>
 
-      {/* ROW 2: Tugas Sistem + Alarm & Kejadian + Trend Aktivitas + Info Akses */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1.2fr 1.1fr 1.1fr 0.8fr',
-        gap: '16px',
-        minHeight: '220px'
-      }}>
-        <SystemTasksPanel tasks={tasks} onViewAll={() => onNavigate?.('/tugas-sistem')} />
-        <AlarmEventsPanel alarms={alarms} />
-        <ActivityTrendPanel />
-        <AccessPermissionPanel user={user} />
-      </div>
+      {/* RIGHT REGION: System Intelligence Sidebar (1fr) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '340px' }}>
+        {/* 1. Tugas Sistem (5 Progress Bars) */}
+        <SystemTasksPanel
+          tasks={tasks}
+          onViewAll={() => onNavigate?.('/tugas-sistem')}
+        />
 
-      {/* ROW 3: 10 Wilayah Perhatian Khusus + Workspace Distribusi + Aktivitas Terbaru + Pintasan */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1.3fr 0.9fr 1.1fr 0.7fr',
-        gap: '16px',
-        minHeight: '270px'
-      }}>
-        <PriorityRegionsTable regions={regions} onViewAll={() => onNavigate?.('/hierarki-wilayah')} />
-        <WorkspaceDistributionPanel distributions={distributions} onManageWorkspace={() => onNavigate?.('/workspace')} />
-        <RecentActivityFeed activities={activities} onViewAll={() => onNavigate?.('/audit-trail')} />
-        <QuickActionsPanel />
-      </div>
+        {/* 2. Perhatian Khusus (3 Priority Status Cards) */}
+        <PerhatianKhususPanel
+          items={attentions}
+          onViewAll={() => onNavigate?.('/alarm')}
+        />
 
-      {/* ROW 4: Footer Filosofi RuangWarga & Berlandaskan Pancasila */}
-      <PhilosophyFooter />
+        {/* 3. Aktivitas Sistem Terbaru (Realtime Timeline Feed) */}
+        <AktivitasSistemTimeline
+          activities={activities}
+          onViewAll={() => onNavigate?.('/audit-trail')}
+        />
+      </div>
     </div>
   );
 };

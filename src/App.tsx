@@ -8,6 +8,7 @@ import { ScopeSelectorModal } from './components/common/ScopeSelectorModal';
 
 export const AppContent: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string>('/dashboard');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isScopeModalOpen, setIsScopeModalOpen] = useState<boolean>(false);
 
   return (
@@ -16,11 +17,13 @@ export const AppContent: React.FC = () => {
       <Sidebar
         currentPath={currentPath}
         onNavigate={(path) => setCurrentPath(path)}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       {/* Main Content Area */}
       <div className="main-content">
-        <Header onOpenScopeModal={() => setIsScopeModalOpen(true)} />
+        <Header />
         
         {/* Dynamic Page Rendering */}
         {currentPath === '/dashboard' && (
@@ -32,27 +35,45 @@ export const AppContent: React.FC = () => {
 
         {currentPath !== '/dashboard' && (
           <div style={{ padding: '32px 24px', maxWidth: '1200px' }}>
-            <div className="panel-card" style={{ padding: '32px', textAlign: 'center' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
-                Halaman {currentPath.replace('/', '').replace('-', ' ').toUpperCase()}
+            <div className="futuristic-card" style={{ padding: '36px', textAlign: 'center' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(0, 229, 255, 0.1)',
+                border: '1px solid rgba(0, 229, 255, 0.3)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#00e5ff',
+                marginBottom: '14px',
+                boxShadow: '0 0 15px rgba(0, 229, 255, 0.2)'
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff', marginBottom: '8px' }}>
+                Modul {currentPath.replace('/', '').replace('-', ' ').toUpperCase()}
               </h2>
-              <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px' }}>
-                Modul ini terhubung ke arsitektur data RuangWarga dan siap dikembangkan lebih lanjut.
+              <p style={{ color: '#94a3b8', fontSize: '13px', maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: 1.4 }}>
+                Modul ini telah terhubung ke arsitektur data RuangWarga Control Center dan siap dikembangkan pada Fase 2.
               </p>
               <button
                 onClick={() => setCurrentPath('/dashboard')}
                 style={{
-                  padding: '8px 18px',
-                  backgroundColor: '#0c2b20',
-                  color: '#ffffff',
+                  padding: '8px 20px',
+                  backgroundColor: 'rgba(0, 229, 255, 0.15)',
+                  border: '1px solid #00e5ff',
+                  color: '#00e5ff',
                   borderRadius: '8px',
-                  border: 'none',
                   fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer'
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 0 12px rgba(0, 229, 255, 0.2)'
                 }}
               >
-                Kembali ke Dashboard
+                Kembali ke Dashboard Utama
               </button>
             </div>
           </div>

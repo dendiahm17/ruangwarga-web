@@ -32,19 +32,20 @@ export const ScopeSelectorModal: React.FC<ScopeSelectorModalProps> = ({ isOpen, 
     <div style={{
       position: 'fixed',
       inset: 0,
-      backgroundColor: 'rgba(15, 23, 42, 0.6)',
-      backdropFilter: 'blur(3px)',
+      backgroundColor: 'rgba(3, 7, 18, 0.8)',
+      backdropFilter: 'blur(8px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 100
     }}>
       <div style={{
-        backgroundColor: '#ffffff',
+        backgroundColor: '#0a1220',
+        border: '1px solid rgba(56, 189, 248, 0.3)',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 229, 255, 0.2)',
         width: '560px',
         maxWidth: '90vw',
         borderRadius: '12px',
-        boxShadow: '0 20px 30px rgba(0,0,0,0.15)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column'
@@ -52,17 +53,17 @@ export const ScopeSelectorModal: React.FC<ScopeSelectorModalProps> = ({ isOpen, 
         {/* Modal Header */}
         <div style={{
           padding: '16px 20px',
-          borderBottom: '1px solid #e2e8f0',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
           <div>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+            <div style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>
               Pilih Lingkup Scope Wilayah
             </div>
-            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
-              Beralih ruang kerja dan lingkup pengawasan sesuai hierarki
+            <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '2px' }}>
+              Beralih ruang kerja dan lingkup pengawasan sesuai hierarki 7 tingkat
             </div>
           </div>
           <button
@@ -85,12 +86,12 @@ export const ScopeSelectorModal: React.FC<ScopeSelectorModalProps> = ({ isOpen, 
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: '#f8fafc',
-            border: '1px solid #cbd5e1',
+            backgroundColor: '#060b13',
+            border: '1px solid rgba(56, 189, 248, 0.2)',
             borderRadius: '8px',
             padding: '8px 12px'
           }}>
-            <Search size={16} color="#64748b" />
+            <Search size={15} color="#64748b" />
             <input
               type="text"
               placeholder="Cari provinsi, kabupaten, kecamatan, desa, RW..."
@@ -101,15 +102,15 @@ export const ScopeSelectorModal: React.FC<ScopeSelectorModalProps> = ({ isOpen, 
                 background: 'transparent',
                 outline: 'none',
                 width: '100%',
-                fontSize: '13px',
-                color: '#1e293b'
+                fontSize: '12.5px',
+                color: '#ffffff'
               }}
             />
           </div>
         </div>
 
         {/* Scope List */}
-        <div style={{ maxHeight: '340px', overflowY: 'auto', padding: '8px 20px 20px 20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ maxHeight: '320px', overflowY: 'auto', padding: '8px 20px 20px 20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {filtered.map((s) => {
             const isSelected = currentScope.id === s.id;
             return (
@@ -125,35 +126,35 @@ export const ScopeSelectorModal: React.FC<ScopeSelectorModalProps> = ({ isOpen, 
                   justifyContent: 'space-between',
                   padding: '10px 14px',
                   borderRadius: '8px',
-                  border: isSelected ? '1.5px solid #10b981' : '1px solid #e2e8f0',
-                  backgroundColor: isSelected ? '#ecfdf5' : '#ffffff',
+                  border: isSelected ? '1px solid #00e5ff' : '1px solid rgba(255, 255, 255, 0.05)',
+                  backgroundColor: isSelected ? 'rgba(0, 229, 255, 0.12)' : '#070e1a',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  if (!isSelected) e.currentTarget.style.backgroundColor = '#f8fafc';
+                  if (!isSelected) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
                 }}
                 onMouseLeave={(e) => {
-                  if (!isSelected) e.currentTarget.style.backgroundColor = '#ffffff';
+                  if (!isSelected) e.currentTarget.style.backgroundColor = '#070e1a';
                 }}
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: isSelected ? '#065f46' : '#0f172a' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: isSelected ? '#00e5ff' : '#ffffff' }}>
                       {s.name}
                     </span>
                     <span style={{
-                      fontSize: '10px',
-                      fontWeight: 600,
-                      backgroundColor: isSelected ? '#a7f3d0' : '#f1f5f9',
-                      color: isSelected ? '#065f46' : '#475569',
-                      padding: '2px 6px',
+                      fontSize: '9.5px',
+                      fontWeight: 700,
+                      backgroundColor: isSelected ? 'rgba(0, 229, 255, 0.2)' : '#1e293b',
+                      color: isSelected ? '#00e5ff' : '#94a3b8',
+                      padding: '1px 6px',
                       borderRadius: '4px'
                     }}>
                       {s.level}
                     </span>
                   </div>
-                  <div style={{ fontSize: '11px', color: '#64748b', marginTop: '3px' }}>
+                  <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '3px' }}>
                     {s.path}
                   </div>
                 </div>
@@ -161,19 +162,19 @@ export const ScopeSelectorModal: React.FC<ScopeSelectorModalProps> = ({ isOpen, 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {isSelected ? (
                     <div style={{
-                      width: '24px',
-                      height: '24px',
+                      width: '22px',
+                      height: '22px',
                       borderRadius: '50%',
-                      backgroundColor: '#10b981',
+                      backgroundColor: '#00e5ff',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#ffffff'
+                      color: '#05080f'
                     }}>
-                      <Check size={14} strokeWidth={2.5} />
+                      <Check size={13} strokeWidth={3} />
                     </div>
                   ) : (
-                    <ChevronRight size={16} color="#94a3b8" />
+                    <ChevronRight size={15} color="#475569" />
                   )}
                 </div>
               </div>

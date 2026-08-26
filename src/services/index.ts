@@ -1,8 +1,9 @@
-import { IWilayahService, IDashboardService } from './interfaces';
-import { FirestoreWilayahService, FirestoreDashboardService } from './firestore/firestoreService';
+import { MockDashboardService } from './mock/MockDashboardService';
+import { MockWilayahService } from './mock/mockService';
+import type { IDashboardService } from './interfaces/IDashboardService';
+import type { IWilayahService } from './interfaces';
 
-// Service provider instances directly connected to Firestore (with seamless fallback)
-export const wilayahService: IWilayahService = new FirestoreWilayahService();
-export const dashboardService: IDashboardService = new FirestoreDashboardService();
+export const dashboardService: IDashboardService = new MockDashboardService();
+export const wilayahService: IWilayahService = new MockWilayahService();
 
-export * from './interfaces';
+export * from './interfaces/IDashboardService';

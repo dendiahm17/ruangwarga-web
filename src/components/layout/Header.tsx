@@ -1,294 +1,179 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ChevronDown, 
-  ChevronRight, 
-  Bell, 
-  Calendar, 
-  Check
-} from 'lucide-react';
-import { useScope } from '../../context/ScopeContext';
+import React, { useState } from 'react';
+import { Search, Bell, MessageSquare, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-interface HeaderProps {
-  onOpenScopeModal: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
-  const { currentScope, breadcrumbs, setScopeById } = useScope();
+export const Header: React.FC = () => {
   const { user } = useAuth();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState<string>('26 Agustus 2026 10:45:32 WIB');
-
-  useEffect(() => {
-    const updateTime = () => {
-      const d = new Date();
-      const months = [
-        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-      ];
-      const day = d.getDate();
-      const month = months[d.getMonth()];
-      const year = d.getFullYear();
-      const hours = String(d.getHours()).padStart(2, '0');
-      const mins = String(d.getMinutes()).padStart(2, '0');
-      const secs = String(d.getSeconds()).padStart(2, '0');
-      setCurrentTime(`${day} ${month} ${year} ${hours}:${mins}:${secs} WIB`);
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const scopeOptions = [
-    { id: 'indonesia', label: '🇮🇩 Indonesia', level: 'Negara' },
-    { id: 'jabar', label: '🏛️ Jawa Barat', level: 'Provinsi' },
-    { id: 'kab-bogor', label: '🏢 Kab. Bogor', level: 'Kabupaten' },
-    { id: 'kec-cibinong', label: '🏘️ Kec. Cibinong', level: 'Kecamatan' },
-    { id: 'kel-sukamaju', label: '🏡 Kel. Sukamaju', level: 'Kelurahan' },
-    { id: 'rw-02', label: '👥 RW 02', level: 'RW' }
-  ];
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <header style={{
-      height: '60px',
-      backgroundColor: '#ffffff',
-      borderBottom: '1px solid #e2e8f0',
+      height: '64px',
+      backgroundColor: 'var(--bg-header)',
+      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid var(--border-card)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '0 24px',
       position: 'sticky',
       top: 0,
-      zIndex: 30,
-      boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+      zIndex: 30
     }}>
-      {/* Left side: Scope Selector & Breadcrumbs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Scope dropdown pill */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #cbd5e1',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              fontSize: '12.5px',
-              fontWeight: 700,
-              color: '#0f172a',
-              transition: 'all 0.15s ease'
-            }}
-          >
-            <span style={{ fontSize: '14px' }}>🇮🇩</span>
-            <span>{currentScope.name}</span>
-            <ChevronDown size={13} color="#64748b" />
-          </button>
-
-          {dropdownOpen && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              marginTop: '6px',
-              width: '240px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '10px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-              padding: '6px',
-              zIndex: 50
-            }}>
-              <div style={{ padding: '6px 10px', fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                Pilih Lingkup Scope
-              </div>
-              {scopeOptions.map((opt) => {
-                const isSelected = currentScope.id === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => {
-                      setScopeById(opt.id);
-                      setDropdownOpen(false);
-                    }}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '7px 10px',
-                      borderRadius: '6px',
-                      border: 'none',
-                      backgroundColor: isSelected ? '#ecfdf5' : 'transparent',
-                      color: isSelected ? '#065f46' : '#1e293b',
-                      fontSize: '12px',
-                      fontWeight: isSelected ? 700 : 500,
-                      cursor: 'pointer',
-                      textAlign: 'left'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = '#f1f5f9';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span>{opt.label}</span>
-                      <span style={{ fontSize: '9.5px', color: '#64748b' }}>({opt.level})</span>
-                    </div>
-                    {isSelected && <Check size={13} color="#10b981" />}
-                  </button>
-                );
-              })}
-              <div style={{ borderTop: '1px solid #f1f5f9', margin: '4px 0', padding: '4px 0 0 0' }}>
-                <button
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    onOpenScopeModal();
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '6px 10px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#059669',
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    textAlign: 'center'
-                  }}
-                >
-                  Jelajahi Semua Wilayah...
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Scope Breadcrumbs */}
+      {/* Title & Subtitle */}
+      <div>
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          fontSize: '12px',
-          color: '#64748b',
-          overflowX: 'auto',
-          maxWidth: '500px'
+          fontSize: '18px',
+          fontWeight: 800,
+          color: '#ffffff',
+          letterSpacing: '-0.02em',
+          lineHeight: 1.1
         }}>
-          {breadcrumbs.map((crumb, idx) => {
-            const isLast = idx === breadcrumbs.length - 1;
-            return (
-              <React.Fragment key={crumb.id}>
-                <button
-                  onClick={() => setScopeById(crumb.id)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontWeight: isLast ? 700 : 500,
-                    color: isLast ? '#0f172a' : '#64748b',
-                    padding: '2px 4px',
-                    borderRadius: '4px',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-                  onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-                >
-                  {crumb.name}
-                </button>
-                {!isLast && <ChevronRight size={12} color="#cbd5e1" />}
-              </React.Fragment>
-            );
-          })}
+          Control Center
+        </div>
+        <div style={{
+          fontSize: '11px',
+          color: '#94a3b8',
+          fontWeight: 500,
+          marginTop: '2px'
+        }}>
+          Platform Administrator
         </div>
       </div>
 
-      {/* Right side: Timestamp, Notifications & Admin Profile */}
+      {/* Center/Right controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Realtime clock display */}
+        {/* Global Search Bar with Ctrl K badge */}
         <div style={{
+          position: 'relative',
+          width: '320px',
           display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          backgroundColor: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '5px 10px',
-          fontSize: '11px',
-          color: '#334155',
-          fontWeight: 600
+          alignItems: 'center'
         }}>
-          <Calendar size={13} color="#64748b" />
-          <span>{currentTime}</span>
+          <Search size={14} color="#64748b" style={{ position: 'absolute', left: '12px' }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Cari wilayah, data, atau fitur..."
+            style={{
+              width: '100%',
+              backgroundColor: '#0a1220',
+              border: '1px solid rgba(56, 189, 248, 0.15)',
+              borderRadius: '8px',
+              padding: '7px 46px 7px 32px',
+              fontSize: '11.5px',
+              color: '#ffffff',
+              outline: 'none',
+              transition: 'all 0.15s ease'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#00e5ff';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 229, 255, 0.2)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.15)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          />
+          <span style={{
+            position: 'absolute',
+            right: '8px',
+            backgroundColor: '#132238',
+            border: '1px solid #1e293b',
+            color: '#64748b',
+            fontSize: '9.5px',
+            fontWeight: 700,
+            padding: '2px 5px',
+            borderRadius: '4px',
+            pointerEvents: 'none'
+          }}>
+            Ctrl K
+          </span>
         </div>
 
-        {/* Notification Bell */}
+        {/* Notifications Icon with Badge */}
         <button style={{
           position: 'relative',
-          width: '34px',
-          height: '34px',
+          width: '36px',
+          height: '36px',
           borderRadius: '8px',
-          border: '1px solid #e2e8f0',
-          backgroundColor: '#ffffff',
+          backgroundColor: '#0a1220',
+          border: '1px solid rgba(56, 189, 248, 0.15)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          color: '#94a3b8',
+          transition: 'all 0.15s ease'
         }}>
-          <Bell size={16} color="#475569" />
+          <Bell size={16} />
           <span style={{
             position: 'absolute',
-            top: '-2px',
-            right: '-2px',
+            top: '-3px',
+            right: '-3px',
             backgroundColor: '#ef4444',
             color: '#ffffff',
             fontSize: '9px',
             fontWeight: 800,
             padding: '0 4px',
             borderRadius: '9999px',
-            border: '2px solid #ffffff',
-            lineHeight: 1.4
+            border: '2px solid #060b13',
+            boxShadow: '0 0 6px rgba(239, 68, 68, 0.5)'
           }}>
             12
           </span>
         </button>
 
-        {/* Profile Card */}
+        {/* Messages Icon */}
+        <button style={{
+          width: '36px',
+          height: '36px',
+          borderRadius: '8px',
+          backgroundColor: '#0a1220',
+          border: '1px solid rgba(56, 189, 248, 0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          color: '#94a3b8'
+        }}>
+          <MessageSquare size={15} />
+        </button>
+
+        {/* Administrator Profile Pill */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          paddingLeft: '12px',
-          borderLeft: '1px solid #e2e8f0'
+          padding: '4px 10px 4px 4px',
+          backgroundColor: '#0a1220',
+          border: '1px solid rgba(56, 189, 248, 0.15)',
+          borderRadius: '24px',
+          cursor: 'pointer'
         }}>
           <div style={{
-            width: '34px',
-            height: '34px',
+            width: '30px',
+            height: '30px',
             borderRadius: '50%',
-            backgroundColor: '#071912',
-            color: '#ffffff',
+            backgroundColor: '#1e293b',
+            border: '1.5px solid #00e5ff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: 800,
-            border: '2px solid #10b981'
+            color: '#00e5ff',
+            boxShadow: '0 0 8px rgba(0, 229, 255, 0.3)'
           }}>
-            AP
+            AU
           </div>
-          <div>
-            <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', lineHeight: 1.1 }}>
-              {user?.name || 'Admin Platform'}
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#ffffff', lineHeight: 1.1 }}>
+              {user?.name || 'Administrator Utama'}
             </div>
-            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, marginTop: '2px' }}>
-              {user?.role || 'Super Administrator'}
+            <div style={{ fontSize: '9.5px', color: '#64748b', fontWeight: 500 }}>
+              Platform Administrator
             </div>
           </div>
         </div>
