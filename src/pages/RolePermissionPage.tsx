@@ -10,12 +10,16 @@ import {
   Unlock,
   Layers,
   Users,
-  Settings
+  Settings,
+  Save,
+  CheckCircle2,
+  HelpCircle
 } from 'lucide-react';
 
 export const RolePermissionPage: React.FC = () => {
   const [roles, setRoles] = useState<RolePermissionMatrix[]>(mockRoleMatrices);
   const [selectedRoleId, setSelectedRoleId] = useState<string>(mockRoleMatrices[0].roleId);
+  const [saveAlert, setSaveAlert] = useState(false);
 
   const selectedRole = roles.find(r => r.roleId === selectedRoleId) || roles[0];
 
@@ -34,6 +38,11 @@ export const RolePermissionPage: React.FC = () => {
       }
       return r;
     }));
+  };
+
+  const handleSaveMatrix = () => {
+    setSaveAlert(true);
+    setTimeout(() => setSaveAlert(false), 3000);
   };
 
   return (
@@ -58,39 +67,69 @@ export const RolePermissionPage: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <ShieldCheck size={22} color="#00e5ff" />
             <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
-              Matriks Role & Hak Akses (Permission)
+              Matriks Peran & Hak Akses (Role & Permission)
             </h1>
           </div>
           <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '3px' }}>
-            Otorisasi berjenjang berbasis Role + Scope + Permission sesuai hierarki 7 tingkat tata kelola
+            Otorisasi 7 Tingkat Tata Kelola (*Nasional, Provinsi, Kab/Kota, Kecamatan, Desa/Kelurahan, RW, RT*)
           </p>
         </div>
 
-        {/* Global Security Status */}
-        <div style={{
-          backgroundColor: '#0a1220',
-          border: '1px solid rgba(16, 185, 129, 0.3)',
-          borderRadius: '8px',
-          padding: '6px 12px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <Lock size={14} color="#10b981" />
-          <span style={{ fontSize: '11.5px', color: '#94a3b8' }}>Kebijakan Keamanan:</span>
-          <strong style={{ fontSize: '12px', color: '#10b981' }}>Enforced & Strict</strong>
+        {/* Global Security Status & Save Button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {saveAlert && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid #10b981',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              color: '#10b981',
+              fontSize: '11.5px',
+              fontWeight: 700
+            }}>
+              <CheckCircle2 size={14} />
+              <span>Matriks Berhasil Diperbarui!</span>
+            </div>
+          )}
+
+          <button
+            onClick={handleSaveMatrix}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'rgba(0, 229, 255, 0.18)',
+              border: '1px solid #00e5ff',
+              borderRadius: '8px',
+              padding: '7px 14px',
+              color: '#00e5ff',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 0 12px rgba(0, 229, 255, 0.25)'
+            }}
+          >
+            <Save size={14} />
+            <span>Simpan Matriks Otorisasi</span>
+          </button>
         </div>
       </div>
 
       {/* 2-Column Layout: Roles List (Left) + Permission Matrix (Right) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '320px minmax(0, 1fr)',
+        gridTemplateColumns: '340px minmax(0, 1fr)',
         gap: '20px'
       }}>
-        {/* Left Column: Role Selector */}
+        {/* Left Column: 7 Roles Selector */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <span className="futuristic-card-title" style={{ paddingLeft: '4px' }}>DAFTAR PERAN (ROLES)</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: '4px' }}>
+            <span className="futuristic-card-title">DAFTAR 7 TINGKAT PERAN (ROLES)</span>
+            <span style={{ fontSize: '10.5px', color: '#00e5ff', fontWeight: 700 }}>{roles.length} Peran</span>
+          </div>
 
           {roles.map((r) => {
             const isSelected = r.roleId === selectedRoleId;
@@ -121,7 +160,7 @@ export const RolePermissionPage: React.FC = () => {
                   </span>
 
                   <span style={{ fontSize: '10px', color: '#64748b' }}>
-                    {r.activeUsersCount.toLocaleString('id-ID')} Pengguna
+                    {r.activeUsersCount.toLocaleString('id-ID')} Pengurus
                   </span>
                 </div>
 
@@ -129,7 +168,7 @@ export const RolePermissionPage: React.FC = () => {
                   {r.roleName}
                 </div>
                 <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px', lineHeight: 1.3 }}>
-                  {r.description.slice(0, 70)}...
+                  {r.description.slice(0, 75)}...
                 </div>
               </div>
             );
@@ -154,7 +193,7 @@ export const RolePermissionPage: React.FC = () => {
                   padding: '2px 8px',
                   borderRadius: '4px'
                 }}>
-                  {selectedRole.tierLevel}
+                  Tier: {selectedRole.tierLevel}
                 </span>
               </div>
               <p style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '4px' }}>
@@ -168,7 +207,7 @@ export const RolePermissionPage: React.FC = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11.5px' }}>
               <thead>
                 <tr style={{ color: '#64748b', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', textAlign: 'center' }}>
-                  <th style={{ padding: '10px', textAlign: 'left', fontWeight: 700 }}>Modul Sistem</th>
+                  <th style={{ padding: '10px', textAlign: 'left', fontWeight: 700 }}>Modul Control Center</th>
                   <th style={{ padding: '10px', fontWeight: 700 }}>Lihat (Read)</th>
                   <th style={{ padding: '10px', fontWeight: 700 }}>Tambah (Create)</th>
                   <th style={{ padding: '10px', fontWeight: 700 }}>Edit (Update)</th>
@@ -184,7 +223,7 @@ export const RolePermissionPage: React.FC = () => {
                       {m.moduleName}
                     </td>
 
-                    {/* Checkboxes / Toggles */}
+                    {/* Interactive Checkbox Toggles */}
                     {[
                       { field: 'canView', val: m.canView },
                       { field: 'canCreate', val: m.canCreate },
