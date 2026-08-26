@@ -80,8 +80,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = '/dashboard', on
 
   return (
     <aside style={{
-      width: '248px',
-      minWidth: '248px',
+      width: '244px',
+      minWidth: '244px',
       backgroundColor: 'var(--sidebar-bg)',
       color: 'var(--sidebar-text)',
       display: 'flex',
@@ -93,34 +93,42 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = '/dashboard', on
     }}>
       {/* Header Logo */}
       <div style={{
-        padding: '20px 18px 16px 18px',
+        padding: '18px 18px 16px 18px',
         borderBottom: '1px solid var(--sidebar-border)',
         display: 'flex',
         alignItems: 'center',
-        gap: '10px'
+        gap: '12px'
       }}>
         <div style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '8px',
-          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          width: '36px',
+          height: '36px',
+          borderRadius: '10px',
+          background: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: '#ffffff',
-          boxShadow: '0 2px 6px rgba(16, 185, 129, 0.4)'
+          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
+          flexShrink: 0
         }}>
           <Leaf size={20} strokeWidth={2.4} />
         </div>
-        <div>
-          <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '17px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '16.5px', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
             RuangWarga
           </div>
-          <div style={{ fontSize: '9px', fontWeight: 600, color: '#34d399', letterSpacing: '0.04em', marginTop: '2px' }}>
-            CONTROL CENTER
-          </div>
-          <div style={{ fontSize: '8.5px', color: '#6ee7b7', opacity: 0.75, letterSpacing: '0.01em' }}>
-            Platform Tata Kelola Masyarakat
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+            <span style={{
+              fontSize: '8.5px',
+              fontWeight: 700,
+              color: '#34d399',
+              letterSpacing: '0.06em',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              padding: '1px 5px',
+              borderRadius: '4px'
+            }}>
+              CONTROL CENTER
+            </span>
           </div>
         </div>
       </div>
@@ -138,10 +146,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = '/dashboard', on
           <div key={idx}>
             {sec.group && (
               <div style={{
-                fontSize: '10px',
+                fontSize: '9.5px',
                 fontWeight: 700,
-                color: '#6b9080',
-                letterSpacing: '0.06em',
+                color: '#4e7a68',
+                letterSpacing: '0.08em',
                 padding: '4px 10px 6px 10px',
                 textTransform: 'uppercase'
               }}>
@@ -163,11 +171,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = '/dashboard', on
                       width: '100%',
                       padding: '8px 12px',
                       borderRadius: '8px',
-                      fontSize: '12.5px',
+                      fontSize: '12px',
                       fontWeight: isActive ? 600 : 500,
-                      color: isActive ? '#ffffff' : '#9eb8ac',
-                      backgroundColor: isActive ? '#15523b' : 'transparent',
-                      border: isActive ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid transparent',
+                      color: isActive ? '#ffffff' : '#8faea2',
+                      backgroundColor: isActive ? 'rgba(16, 185, 129, 0.18)' : 'transparent',
+                      borderLeft: isActive ? '3px solid #10b981' : '3px solid transparent',
+                      borderTop: 'none',
+                      borderRight: 'none',
+                      borderBottom: 'none',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease'
@@ -175,25 +186,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = '/dashboard', on
                     onMouseEnter={(e) => {
                       if (!isActive) {
                         e.currentTarget.style.backgroundColor = 'var(--sidebar-hover)';
-                        e.currentTarget.style.color = '#e2ece7';
+                        e.currentTarget.style.color = '#d1e3db';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
                         e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#9eb8ac';
+                        e.currentTarget.style.color = '#8faea2';
                       }
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Icon size={16} color={isActive ? '#34d399' : '#6b9080'} strokeWidth={isActive ? 2.2 : 1.8} />
+                      <Icon size={16} color={isActive ? '#34d399' : '#5d8a77'} strokeWidth={isActive ? 2.2 : 1.8} />
                       <span>{item.label}</span>
                     </div>
                     {item.badge && (
                       <span style={{
                         backgroundColor: '#ef4444',
                         color: '#ffffff',
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: 700,
                         padding: '1px 6px',
                         borderRadius: '9999px',
@@ -212,34 +223,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath = '/dashboard', on
 
       {/* Footer System Status */}
       <div style={{
-        padding: '14px 16px',
+        padding: '12px 14px',
         borderTop: '1px solid var(--sidebar-border)',
         backgroundColor: 'var(--sidebar-darker)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px'
+        gap: '6px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '11px', color: '#9eb8ac' }}>Status Sistem</span>
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#34d399'
-          }}>
-            <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-            Sehat
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
-          <span style={{ color: '#6b9080' }}>Uptime</span>
-          <span style={{ fontWeight: 600, color: '#e2ece7' }}>99.98%</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10.5px' }}>
-          <span style={{ color: '#6b9080' }}>Versi Platform</span>
-          <span style={{ fontFamily: 'monospace', color: '#9eb8ac' }}>v1.0.0</span>
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: '8px',
+          padding: '8px 10px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '10.5px', color: '#8faea2' }}>Status Sistem</span>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '10.5px',
+              fontWeight: 600,
+              color: '#34d399'
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+              Operasional
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10.5px' }}>
+            <span style={{ color: '#5d8a77' }}>Uptime 99.98%</span>
+            <span style={{ fontFamily: 'monospace', color: '#8faea2', fontSize: '10px' }}>v1.0.0</span>
+          </div>
         </div>
       </div>
     </aside>

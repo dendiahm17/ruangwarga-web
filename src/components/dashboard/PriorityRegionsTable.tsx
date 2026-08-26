@@ -11,8 +11,13 @@ export const PriorityRegionsTable: React.FC<PriorityRegionsTableProps> = ({ regi
   return (
     <div className="panel-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
-      <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em', marginBottom: '12px' }}>
-        10 WILAYAH DENGAN PERHATIAN KHUSUS
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+        <div className="panel-title">
+          <span>10 Wilayah Perhatian Khusus</span>
+        </div>
+        <span style={{ fontSize: '10.5px', color: '#64748b', fontWeight: 600 }}>
+          Berdasarkan KPI
+        </span>
       </div>
 
       {/* Table Container */}
@@ -20,10 +25,11 @@ export const PriorityRegionsTable: React.FC<PriorityRegionsTableProps> = ({ regi
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11.5px' }}>
           <thead>
             <tr style={{ color: '#64748b', borderBottom: '1px solid #f1f5f9', textAlign: 'left' }}>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>#</th>
               <th style={{ padding: '6px 8px', fontWeight: 600 }}>Wilayah</th>
               <th style={{ padding: '6px 8px', fontWeight: 600 }}>Tingkat</th>
               <th style={{ padding: '6px 8px', fontWeight: 600 }}>Indikator Utama</th>
-              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Kondisi</th>
+              <th style={{ padding: '6px 8px', fontWeight: 600 }}>Status</th>
               <th style={{ padding: '6px 8px', fontWeight: 600, textAlign: 'center' }}>Aksi</th>
             </tr>
           </thead>
@@ -32,49 +38,50 @@ export const PriorityRegionsTable: React.FC<PriorityRegionsTableProps> = ({ regi
               const isUrgent = region.status === 'Perlu Penanganan';
               return (
                 <tr key={region.id} style={{ borderBottom: '1px solid #f8fafc' }}>
-                  {/* Wilayah with rank badge */}
-                  <td style={{ padding: '7px 8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{
-                        width: '18px',
-                        height: '18px',
-                        borderRadius: '50%',
-                        backgroundColor: '#ef4444',
-                        color: '#ffffff',
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        {region.rank}
-                      </span>
-                      <span style={{ fontWeight: 600, color: '#1e293b' }}>
-                        {region.name}
-                      </span>
-                    </div>
+                  {/* Rank */}
+                  <td style={{ padding: '6px 8px', width: '28px' }}>
+                    <span style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '4px',
+                      backgroundColor: region.rank <= 3 ? '#fee2e2' : '#f1f5f9',
+                      color: region.rank <= 3 ? '#dc2626' : '#475569',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {region.rank}
+                    </span>
+                  </td>
+
+                  {/* Wilayah */}
+                  <td style={{ padding: '6px 8px' }}>
+                    <span style={{ fontWeight: 700, color: '#0f172a' }}>
+                      {region.name}
+                    </span>
                   </td>
 
                   {/* Level */}
-                  <td style={{ padding: '7px 8px', color: '#64748b' }}>
+                  <td style={{ padding: '6px 8px', color: '#64748b', fontSize: '11px' }}>
                     {region.levelName}
                   </td>
 
                   {/* Metric */}
-                  <td style={{ padding: '7px 8px' }}>
-                    <span style={{ color: '#64748b' }}>{region.metricLabel}</span>{' '}
-                    <span style={{ fontWeight: 700, color: '#0f172a' }}>{region.metricValue}</span>
+                  <td style={{ padding: '6px 8px' }}>
+                    <span style={{ color: '#64748b', fontSize: '10.5px' }}>{region.metricLabel}</span>{' '}
+                    <strong style={{ color: '#0f172a' }}>{region.metricValue}</strong>
                   </td>
 
                   {/* Status Badge */}
-                  <td style={{ padding: '7px 8px' }}>
+                  <td style={{ padding: '6px 8px' }}>
                     <span style={{
                       display: 'inline-block',
-                      padding: '2px 8px',
+                      padding: '2px 6px',
                       borderRadius: '4px',
-                      fontSize: '10.5px',
-                      fontWeight: 600,
+                      fontSize: '10px',
+                      fontWeight: 700,
                       backgroundColor: isUrgent ? '#fef2f2' : '#fffbeb',
                       color: isUrgent ? '#b91c1c' : '#b45309',
                       border: `1px solid ${isUrgent ? '#fecaca' : '#fde68a'}`
@@ -84,20 +91,29 @@ export const PriorityRegionsTable: React.FC<PriorityRegionsTableProps> = ({ regi
                   </td>
 
                   {/* Action */}
-                  <td style={{ padding: '7px 8px', textAlign: 'center' }}>
+                  <td style={{ padding: '6px 8px', textAlign: 'center' }}>
                     <button
                       style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#64748b',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        color: '#475569',
                         cursor: 'pointer',
-                        padding: '4px',
-                        borderRadius: '4px'
+                        padding: '3px 6px',
+                        borderRadius: '4px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#0284c7'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#0284c7';
+                        e.currentTarget.style.borderColor = '#0284c7';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#475569';
+                        e.currentTarget.style.borderColor = '#e2e8f0';
+                      }}
                     >
-                      <Eye size={14} />
+                      <Eye size={12} />
                     </button>
                   </td>
                 </tr>
@@ -117,15 +133,15 @@ export const PriorityRegionsTable: React.FC<PriorityRegionsTableProps> = ({ regi
           padding: '6px 0 0 0',
           background: 'none',
           border: 'none',
-          color: '#2563eb',
+          color: '#0284c7',
           fontSize: '11.5px',
           fontWeight: 600,
           cursor: 'pointer',
           marginTop: 'auto'
         }}
       >
-        <span>Lihat Semua Wilayah</span>
-        <ChevronRight size={14} />
+        <span>Lihat Hierarki & Data Seluruh Wilayah</span>
+        <ChevronRight size={13} />
       </button>
     </div>
   );

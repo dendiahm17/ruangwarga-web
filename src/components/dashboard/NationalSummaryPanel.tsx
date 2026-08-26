@@ -7,7 +7,6 @@ import {
   CheckCircle, 
   Flag,
   ArrowUpRight,
-  ArrowDownRight,
   ChevronDown
 } from 'lucide-react';
 import { DashboardMetrics } from '../../core/types/dashboard.types';
@@ -28,7 +27,8 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
       isPositive: metrics.totalWorkspace.isPositive,
       icon: Building2,
       color: '#0284c7',
-      bg: '#e0f2fe'
+      bg: '#f0f9ff',
+      borderColor: '#e0f2fe'
     },
     {
       title: 'Total Warga Aktif',
@@ -37,16 +37,18 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
       isPositive: metrics.totalWargaAktif.isPositive,
       icon: Users,
       color: '#7c3aed',
-      bg: '#ede9fe'
+      bg: '#faf5ff',
+      borderColor: '#f3e8ff'
     },
     {
-      title: 'Aktivitas',
+      title: 'Aktivitas Tercatat',
       value: metrics.totalAktivitas.value,
       change: metrics.totalAktivitas.change,
       isPositive: metrics.totalAktivitas.isPositive,
       icon: Activity,
       color: '#ea580c',
-      bg: '#ffedd5'
+      bg: '#fff7ed',
+      borderColor: '#ffedd5'
     },
     {
       title: 'Laporan Masuk',
@@ -55,7 +57,8 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
       isPositive: metrics.laporanMasuk.isPositive,
       icon: FileText,
       color: '#dc2626',
-      bg: '#fee2e2'
+      bg: '#fef2f2',
+      borderColor: '#fee2e2'
     },
     {
       title: 'Tingkat Respons',
@@ -64,7 +67,8 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
       isPositive: metrics.tingkatRespons.isPositive,
       icon: CheckCircle,
       color: '#16a34a',
-      bg: '#dcfce7'
+      bg: '#f0fdf4',
+      borderColor: '#dcfce7'
     },
     {
       title: 'Kegiatan Selesai',
@@ -73,16 +77,22 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
       isPositive: metrics.kegiatanSelesai.isPositive,
       icon: Flag,
       color: '#9333ea',
-      bg: '#f3e8ff'
+      bg: '#fdf4ff',
+      borderColor: '#fae8ff'
     }
   ];
 
   return (
     <div className="panel-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em' }}>
-          RINGKASAN NASIONAL
+      {/* Header with Time filter dropdown */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+        <div>
+          <div className="panel-title">
+            <span>Ringkasan Nasional</span>
+          </div>
+          <div className="panel-subtitle">
+            Agregasi performa dan metrik utama seluruh wilayah
+          </div>
         </div>
 
         {/* Time Filter Pill */}
@@ -94,12 +104,12 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
               alignItems: 'center',
               gap: '6px',
               padding: '4px 10px',
-              borderRadius: '6px',
+              borderRadius: '8px',
               border: '1px solid #e2e8f0',
               backgroundColor: '#f8fafc',
               fontSize: '11.5px',
               color: '#334155',
-              fontWeight: 500,
+              fontWeight: 600,
               cursor: 'pointer'
             }}
           >
@@ -114,8 +124,8 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
               marginTop: '4px',
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: '6px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
               zIndex: 20,
               width: '140px',
               overflow: 'hidden'
@@ -128,11 +138,12 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
                     setDropdownOpen(false);
                   }}
                   style={{
-                    padding: '6px 10px',
+                    padding: '7px 10px',
                     fontSize: '11.5px',
                     cursor: 'pointer',
                     backgroundColor: timeRange === t ? '#f1f5f9' : 'transparent',
-                    color: '#1e293b'
+                    color: '#1e293b',
+                    fontWeight: timeRange === t ? 600 : 400
                   }}
                 >
                   {t}
@@ -148,7 +159,7 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
         gridTemplateRows: 'repeat(2, 1fr)',
-        gap: '12px',
+        gap: '10px',
         flex: 1
       }}>
         {cards.map((card, idx) => {
@@ -159,44 +170,58 @@ export const NationalSummaryPanel: React.FC<NationalSummaryPanelProps> = ({ metr
               style={{
                 backgroundColor: '#ffffff',
                 border: '1px solid #edf2f7',
-                borderRadius: '8px',
-                padding: '12px 14px',
+                borderRadius: '10px',
+                padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                gap: '10px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                transition: 'border-color 0.15s ease'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#cbd5e1'}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = '#edf2f7'}
             >
               <div style={{
-                width: '38px',
-                height: '38px',
+                width: '36px',
+                height: '36px',
                 borderRadius: '8px',
                 backgroundColor: card.bg,
+                border: `1px solid ${card.borderColor}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0
               }}>
-                <Icon size={20} color={card.color} strokeWidth={2} />
+                <Icon size={18} color={card.color} strokeWidth={2.2} />
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{
+                  fontSize: '10.5px',
+                  color: '#64748b',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
                   {card.title}
                 </div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', marginTop: '2px', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '16.5px', fontWeight: 800, color: '#0f172a', marginTop: '1px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
                   {card.value}
                 </div>
                 <div style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '2px',
-                  fontSize: '10.5px',
-                  fontWeight: 600,
-                  color: card.isPositive ? '#16a34a' : '#16a34a',
+                  fontSize: '9.5px',
+                  fontWeight: 700,
+                  color: '#16a34a',
+                  backgroundColor: '#f0fdf4',
+                  padding: '1px 4px',
+                  borderRadius: '4px',
                   marginTop: '3px'
                 }}>
-                  <ArrowUpRight size={12} />
+                  <ArrowUpRight size={11} />
                   <span>{card.change}</span>
                 </div>
               </div>

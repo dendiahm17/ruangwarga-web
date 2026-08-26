@@ -13,18 +13,20 @@ export const QuickActionsPanel: React.FC = () => {
     { label: 'Buat Pengumuman', icon: Megaphone, color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Kelola Pengguna', icon: Users, color: '#9333ea', bg: '#faf5ff' },
     { label: 'Lihat Audit Trail', icon: History, color: '#d97706', bg: '#fffbeb' },
-    { label: 'Backup Data', icon: DatabaseBackup, color: '#475569', bg: '#f8fafc' }
+    { label: 'Cadangkan Data', icon: DatabaseBackup, color: '#475569', bg: '#f8fafc' }
   ];
 
   return (
     <div className="panel-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
-      <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em', marginBottom: '12px' }}>
-        PINTASAN SISTEM
+      <div style={{ marginBottom: '10px' }}>
+        <div className="panel-title">
+          <span>Pintasan Sistem</span>
+        </div>
       </div>
 
       {/* Button List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
         {actions.map((act, idx) => {
           const Icon = act.icon;
           return (
@@ -34,12 +36,12 @@ export const QuickActionsPanel: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '9px 12px',
+                padding: '8px 10px',
                 borderRadius: '8px',
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
                 color: '#1e293b',
-                fontSize: '12px',
+                fontSize: '11.5px',
                 fontWeight: 600,
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -48,10 +50,12 @@ export const QuickActionsPanel: React.FC = () => {
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = act.bg;
                 e.currentTarget.style.borderColor = act.color;
+                e.currentTarget.style.transform = 'translateX(2px)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = '#ffffff';
                 e.currentTarget.style.borderColor = '#e2e8f0';
+                e.currentTarget.style.transform = 'none';
               }}
             >
               <div style={{
@@ -61,11 +65,12 @@ export const QuickActionsPanel: React.FC = () => {
                 backgroundColor: act.bg,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                flexShrink: 0
               }}>
-                <Icon size={14} color={act.color} strokeWidth={2.2} />
+                <Icon size={13} color={act.color} strokeWidth={2.2} />
               </div>
-              <span>{act.label}</span>
+              <span style={{ color: '#0f172a' }}>{act.label}</span>
             </button>
           );
         })}

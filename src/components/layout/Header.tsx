@@ -4,9 +4,6 @@ import {
   ChevronRight, 
   Bell, 
   Calendar, 
-  Clock, 
-  User as UserIcon,
-  Globe2,
   Check
 } from 'lucide-react';
 import { useScope } from '../../context/ScopeContext';
@@ -22,7 +19,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>('26 Agustus 2026 10:45:32 WIB');
 
-  // Real-time clock update formatted to Indonesian local style
   useEffect(() => {
     const updateTime = () => {
       const d = new Date();
@@ -55,19 +51,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
 
   return (
     <header style={{
-      height: '64px',
+      height: '60px',
       backgroundColor: '#ffffff',
-      borderBottom: '1px solid #e6ebf0',
+      borderBottom: '1px solid #e2e8f0',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '0 24px',
       position: 'sticky',
       top: 0,
-      zIndex: 30
+      zIndex: 30,
+      boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
     }}>
       {/* Left side: Scope Selector & Breadcrumbs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         {/* Scope dropdown pill */}
         <div style={{ position: 'relative' }}>
           <button
@@ -81,14 +78,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
               borderRadius: '8px',
               padding: '6px 12px',
               cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#0f172a'
+              fontSize: '12.5px',
+              fontWeight: 700,
+              color: '#0f172a',
+              transition: 'all 0.15s ease'
             }}
           >
             <span style={{ fontSize: '14px' }}>🇮🇩</span>
             <span>{currentScope.name}</span>
-            <ChevronDown size={14} color="#64748b" />
+            <ChevronDown size={13} color="#64748b" />
           </button>
 
           {dropdownOpen && (
@@ -105,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
               padding: '6px',
               zIndex: 50
             }}>
-              <div style={{ padding: '6px 10px', fontSize: '10.5px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
+              <div style={{ padding: '6px 10px', fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
                 Pilih Lingkup Scope
               </div>
               {scopeOptions.map((opt) => {
@@ -122,13 +120,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '8px 10px',
+                      padding: '7px 10px',
                       borderRadius: '6px',
                       border: 'none',
                       backgroundColor: isSelected ? '#ecfdf5' : 'transparent',
                       color: isSelected ? '#065f46' : '#1e293b',
-                      fontSize: '12.5px',
-                      fontWeight: isSelected ? 600 : 500,
+                      fontSize: '12px',
+                      fontWeight: isSelected ? 700 : 500,
                       cursor: 'pointer',
                       textAlign: 'left'
                     }}
@@ -141,9 +139,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span>{opt.label}</span>
-                      <span style={{ fontSize: '10px', color: '#64748b' }}>({opt.level})</span>
+                      <span style={{ fontSize: '9.5px', color: '#64748b' }}>({opt.level})</span>
                     </div>
-                    {isSelected && <Check size={14} color="#10b981" />}
+                    {isSelected && <Check size={13} color="#10b981" />}
                   </button>
                 );
               })}
@@ -156,8 +154,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
                   style={{
                     width: '100%',
                     padding: '6px 10px',
-                    fontSize: '11.5px',
-                    fontWeight: 600,
+                    fontSize: '11px',
+                    fontWeight: 700,
                     color: '#059669',
                     backgroundColor: 'transparent',
                     border: 'none',
@@ -177,11 +175,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          fontSize: '12.5px',
+          gap: '4px',
+          fontSize: '12px',
           color: '#64748b',
           overflowX: 'auto',
-          maxWidth: '520px'
+          maxWidth: '500px'
         }}>
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
@@ -193,8 +191,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '12.5px',
-                    fontWeight: isLast ? 600 : 400,
+                    fontSize: '12px',
+                    fontWeight: isLast ? 700 : 500,
                     color: isLast ? '#0f172a' : '#64748b',
                     padding: '2px 4px',
                     borderRadius: '4px',
@@ -205,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
                 >
                   {crumb.name}
                 </button>
-                {!isLast && <ChevronRight size={13} color="#94a3b8" />}
+                {!isLast && <ChevronRight size={12} color="#cbd5e1" />}
               </React.Fragment>
             );
           })}
@@ -213,29 +211,29 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
       </div>
 
       {/* Right side: Timestamp, Notifications & Admin Profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Realtime clock display */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          gap: '6px',
           backgroundColor: '#f8fafc',
           border: '1px solid #e2e8f0',
           borderRadius: '8px',
-          padding: '6px 12px',
-          fontSize: '11.5px',
+          padding: '5px 10px',
+          fontSize: '11px',
           color: '#334155',
-          fontWeight: 500
+          fontWeight: 600
         }}>
-          <Calendar size={14} color="#64748b" />
+          <Calendar size={13} color="#64748b" />
           <span>{currentTime}</span>
         </div>
 
         {/* Notification Bell */}
         <button style={{
           position: 'relative',
-          width: '38px',
-          height: '38px',
+          width: '34px',
+          height: '34px',
           borderRadius: '8px',
           border: '1px solid #e2e8f0',
           backgroundColor: '#ffffff',
@@ -244,18 +242,19 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
           justifyContent: 'center',
           cursor: 'pointer'
         }}>
-          <Bell size={18} color="#475569" />
+          <Bell size={16} color="#475569" />
           <span style={{
             position: 'absolute',
-            top: '-3px',
-            right: '-3px',
+            top: '-2px',
+            right: '-2px',
             backgroundColor: '#ef4444',
             color: '#ffffff',
-            fontSize: '9.5px',
-            fontWeight: 700,
-            padding: '1px 4.5px',
+            fontSize: '9px',
+            fontWeight: 800,
+            padding: '0 4px',
             borderRadius: '9999px',
-            border: '2px solid #ffffff'
+            border: '2px solid #ffffff',
+            lineHeight: 1.4
           }}>
             12
           </span>
@@ -270,24 +269,25 @@ export const Header: React.FC<HeaderProps> = ({ onOpenScopeModal }) => {
           borderLeft: '1px solid #e2e8f0'
         }}>
           <div style={{
-            width: '36px',
-            height: '36px',
+            width: '34px',
+            height: '34px',
             borderRadius: '50%',
-            backgroundColor: '#0c2b20',
+            backgroundColor: '#071912',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '13px',
-            fontWeight: 700
+            fontSize: '12px',
+            fontWeight: 800,
+            border: '2px solid #10b981'
           }}>
             AP
           </div>
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', lineHeight: 1.1 }}>
               {user?.name || 'Admin Platform'}
             </div>
-            <div style={{ fontSize: '10.5px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>
+            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, marginTop: '2px' }}>
               {user?.role || 'Super Administrator'}
             </div>
           </div>

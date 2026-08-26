@@ -25,12 +25,17 @@ export const AlarmEventsPanel: React.FC<AlarmEventsPanelProps> = ({ alarms }) =>
   return (
     <div className="panel-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Title */}
-      <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em', marginBottom: '14px' }}>
-        ALARM & KEJADIAN PENTING
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+        <div className="panel-title">
+          <span>Alarm & Kejadian Penting</span>
+        </div>
+        <span style={{ fontSize: '10.5px', color: '#ef4444', fontWeight: 700 }}>
+          {alarms.length} Terdeteksi
+        </span>
       </div>
 
       {/* Alarm list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflowY: 'auto' }}>
         {alarms.map((alarm) => {
           const style = getAlarmBadge(alarm.level);
           const Icon = style.icon;
@@ -41,13 +46,18 @@ export const AlarmEventsPanel: React.FC<AlarmEventsPanelProps> = ({ alarms }) =>
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '10px',
-                paddingBottom: '8px',
-                borderBottom: '1px solid #f1f5f9'
+                padding: '8px',
+                borderRadius: '8px',
+                backgroundColor: '#fafbfc',
+                border: '1px solid #f1f5f9',
+                transition: 'border-color 0.15s ease'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = style.border}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = '#f1f5f9'}
             >
               <div style={{
-                width: '28px',
-                height: '28px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '6px',
                 backgroundColor: style.bg,
                 border: `1px solid ${style.border}`,
@@ -57,19 +67,19 @@ export const AlarmEventsPanel: React.FC<AlarmEventsPanelProps> = ({ alarms }) =>
                 flexShrink: 0,
                 marginTop: '1px'
               }}>
-                <Icon size={15} color={style.color} />
+                <Icon size={13} color={style.color} strokeWidth={2.2} />
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#1e293b', lineHeight: 1.3 }}>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#0f172a', lineHeight: 1.25 }}>
                   {alarm.title}
                 </div>
-                <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px' }}>
+                <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px', lineHeight: 1.3 }}>
                   {alarm.subtitle}
                 </div>
               </div>
 
-              <div style={{ fontSize: '10.5px', color: '#94a3b8', fontWeight: 500, flexShrink: 0 }}>
+              <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600, flexShrink: 0 }}>
                 {alarm.time}
               </div>
             </div>
