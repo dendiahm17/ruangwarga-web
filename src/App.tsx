@@ -12,6 +12,8 @@ import { RolePermissionPage } from './pages/RolePermissionPage';
 import { AuditTrailPage } from './pages/AuditTrailPage';
 import { TugasSistemPage } from './pages/TugasSistemPage';
 import { WorkflowPage } from './pages/WorkflowPage';
+import { WawasanPage } from './pages/WawasanPage';
+import { PengaturanPage } from './pages/PengaturanPage';
 import { ScopeProvider } from './context/ScopeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ScopeSelectorModal } from './components/common/ScopeSelectorModal';
@@ -83,60 +85,12 @@ export const AppContent: React.FC = () => {
           <WorkflowPage />
         )}
 
-        {currentPath !== '/dashboard' &&
-         currentPath !== '/wilayah' &&
-         currentPath !== '/workspace' &&
-         currentPath !== '/pengguna' &&
-         currentPath !== '/pengurus' &&
-         currentPath !== '/alarm' &&
-         currentPath !== '/laporan' &&
-         currentPath !== '/role-permission' &&
-         currentPath !== '/audit-trail' &&
-         currentPath !== '/tugas-sistem' &&
-         currentPath !== '/workflow' && (
-          <div style={{ padding: '32px 24px', maxWidth: '1200px' }}>
-            <div className="futuristic-card" style={{ padding: '36px', textAlign: 'center' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                backgroundColor: 'rgba(0, 229, 255, 0.1)',
-                border: '1px solid rgba(0, 229, 255, 0.3)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#00e5ff',
-                marginBottom: '14px',
-                boxShadow: '0 0 15px rgba(0, 229, 255, 0.2)'
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-              </div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff', marginBottom: '8px' }}>
-                Modul {currentPath.replace('/', '').replace('-', ' ').toUpperCase()}
-              </h2>
-              <p style={{ color: '#94a3b8', fontSize: '13px', maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: 1.4 }}>
-                Modul ini telah terhubung ke arsitektur data RuangWarga Control Center.
-              </p>
-              <button
-                onClick={() => setCurrentPath('/dashboard')}
-                style={{
-                  padding: '8px 20px',
-                  backgroundColor: 'rgba(0, 229, 255, 0.15)',
-                  border: '1px solid #00e5ff',
-                  color: '#00e5ff',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 0 12px rgba(0, 229, 255, 0.2)'
-                }}
-              >
-                Kembali ke Dashboard Utama
-              </button>
-            </div>
-          </div>
+        {currentPath === '/wawasan' && (
+          <WawasanPage />
+        )}
+
+        {currentPath === '/pengaturan' && (
+          <PengaturanPage />
         )}
       </div>
 
