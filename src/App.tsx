@@ -4,6 +4,8 @@ import { Header } from './components/layout/Header';
 import { DashboardPage } from './pages/DashboardPage';
 import { WilayahPage } from './pages/WilayahPage';
 import { WorkspacePage } from './pages/WorkspacePage';
+import { PenggunaPage } from './pages/PenggunaPage';
+import { PengurusPage } from './pages/PengurusPage';
 import { ScopeProvider } from './context/ScopeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ScopeSelectorModal } from './components/common/ScopeSelectorModal';
@@ -43,7 +45,19 @@ export const AppContent: React.FC = () => {
           <WorkspacePage />
         )}
 
-        {currentPath !== '/dashboard' && currentPath !== '/wilayah' && currentPath !== '/workspace' && (
+        {currentPath === '/pengguna' && (
+          <PenggunaPage />
+        )}
+
+        {currentPath === '/pengurus' && (
+          <PengurusPage />
+        )}
+
+        {currentPath !== '/dashboard' &&
+         currentPath !== '/wilayah' &&
+         currentPath !== '/workspace' &&
+         currentPath !== '/pengguna' &&
+         currentPath !== '/pengurus' && (
           <div style={{ padding: '32px 24px', maxWidth: '1200px' }}>
             <div className="futuristic-card" style={{ padding: '36px', textAlign: 'center' }}>
               <div style={{
