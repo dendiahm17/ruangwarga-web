@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { DashboardPage } from './pages/DashboardPage';
+import { WilayahPage } from './pages/WilayahPage';
+import { WorkspacePage } from './pages/WorkspacePage';
 import { ScopeProvider } from './context/ScopeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ScopeSelectorModal } from './components/common/ScopeSelectorModal';
@@ -33,7 +35,15 @@ export const AppContent: React.FC = () => {
           />
         )}
 
-        {currentPath !== '/dashboard' && (
+        {currentPath === '/wilayah' && (
+          <WilayahPage onNavigateWorkspace={() => setCurrentPath('/workspace')} />
+        )}
+
+        {currentPath === '/workspace' && (
+          <WorkspacePage />
+        )}
+
+        {currentPath !== '/dashboard' && currentPath !== '/wilayah' && currentPath !== '/workspace' && (
           <div style={{ padding: '32px 24px', maxWidth: '1200px' }}>
             <div className="futuristic-card" style={{ padding: '36px', textAlign: 'center' }}>
               <div style={{
@@ -57,7 +67,7 @@ export const AppContent: React.FC = () => {
                 Modul {currentPath.replace('/', '').replace('-', ' ').toUpperCase()}
               </h2>
               <p style={{ color: '#94a3b8', fontSize: '13px', maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: 1.4 }}>
-                Modul ini telah terhubung ke arsitektur data RuangWarga Control Center dan siap dikembangkan pada Fase 2.
+                Modul ini telah terhubung ke arsitektur data RuangWarga Control Center dan siap dikembangkan berikutnya.
               </p>
               <button
                 onClick={() => setCurrentPath('/dashboard')}
