@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { OfficerAccount } from '../core/types/user.types';
-import { mockOfficerAccounts } from '../services/mock/mockUserData';
+import { FirestoreRealtimeService } from '../services/firestore/firestoreRealtimeService';
+import { isFirebaseConfigured } from '../config/firebase';
 import { CreateOfficerModal } from '../components/users/CreateOfficerModal';
 import {
   UserCheck,
@@ -11,14 +12,23 @@ import {
   Mail,
   Calendar,
   Layers,
-  CheckCircle2
+  CheckCircle2,
+  Database
 } from 'lucide-react';
 
 export const PengurusPage: React.FC = () => {
-  const [officers, setOfficers] = useState<OfficerAccount[]>(mockOfficerAccounts);
+  const [officers, setOfficers] = useState<OfficerAccount[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTier, setSelectedTier] = useState<string>('Semua');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Subscribe to Realtime Firestore Officers
+  useEffect(() => {
+    const unsubscribe = FirestoreRealtimeService.subscribeToOfficers((items) => {
+      setOfficers(items);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filteredOfficers = officers.filter((off) => {
     const matchSearch = off.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -29,8 +39,9 @@ export const PengurusPage: React.FC = () => {
     return matchSearch && matchTier;
   });
 
-  const handleSaveOfficer = (newOff: OfficerAccount) => {
-    setOfficers([newOff, ...officers]);
+  const handleSaveOfficer = async (newOff: OfficerAccount) => {
+    await FirestoreRealtimeService.saveOfficer(newOff);
+    setOfficers(prev => [newOff, ...prev]);
   };
 
   return (
@@ -63,27 +74,44 @@ export const PengurusPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Action Button */}
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          style={{
+        {/* Backend status & Action Button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            backgroundColor: '#0a1220',
+            border: `1px solid ${isFirebaseConfigured ? 'rgba(16, 185, 129, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
+            borderRadius: '8px',
+            padding: '6px 12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            backgroundColor: 'rgba(0, 229, 255, 0.15)',
-            border: '1px solid #00e5ff',
-            borderRadius: '8px',
-            padding: '8px 14px',
-            color: '#00e5ff',
-            fontSize: '12px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 0 12px rgba(0, 229, 255, 0.25)'
-          }}
-        >
-          <Plus size={15} />
-          <span>Registrasi Pengurus Baru</span>
-        </button>
+            gap: '6px'
+          }}>
+            <Database size={13} color={isFirebaseConfigured ? '#10b981' : '#38bdf8'} />
+            <span style={{ fontSize: '11px', color: isFirebaseConfigured ? '#10b981' : '#38bdf8', fontWeight: 700 }}>
+              {isFirebaseConfigured ? 'Firestore Live Sync' : 'Smart Offline Mode'}
+            </span>
+          </div>
+
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: 'rgba(0, 229, 255, 0.15)',
+              border: '1px solid #00e5ff',
+              borderRadius: '8px',
+              padding: '8px 14px',
+              color: '#00e5ff',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 0 12px rgba(0, 229, 255, 0.25)'
+            }}
+          >
+            <Plus size={15} />
+            <span>Registrasi Pengurus Baru</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Toolbar */}

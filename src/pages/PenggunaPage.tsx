@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CitizenUser } from '../core/types/user.types';
-import { mockCitizenUsers } from '../services/mock/mockUserData';
+import { FirestoreRealtimeService } from '../services/firestore/firestoreRealtimeService';
+import { isFirebaseConfigured } from '../config/firebase';
 import { UserDetailModal } from '../components/users/UserDetailModal';
 import {
   Users,
@@ -11,15 +12,24 @@ import {
   XCircle,
   Eye,
   ShieldCheck,
-  Smartphone
+  Smartphone,
+  Database
 } from 'lucide-react';
 
 export const PenggunaPage: React.FC = () => {
-  const [users, setUsers] = useState<CitizenUser[]>(mockCitizenUsers);
+  const [users, setUsers] = useState<CitizenUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'pending' | 'rejected'>('all');
   const [selectedUser, setSelectedUser] = useState<CitizenUser | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  // Subscribe to Realtime Firestore Users collection
+  useEffect(() => {
+    const unsubscribe = FirestoreRealtimeService.subscribeToCitizens((items) => {
+      setUsers(items);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filteredUsers = users.filter((u) => {
     const matchesSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -30,12 +40,14 @@ export const PenggunaPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleVerify = (userId: string) => {
-    setUsers(users.map(u => u.id === userId ? { ...u, verificationStatus: 'verified' } : u));
+  const handleVerify = async (userId: string) => {
+    await FirestoreRealtimeService.verifyCitizenStatus(userId, 'verified');
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, verificationStatus: 'verified' } : u));
   };
 
-  const handleReject = (userId: string) => {
-    setUsers(users.map(u => u.id === userId ? { ...u, verificationStatus: 'rejected' } : u));
+  const handleReject = async (userId: string) => {
+    await FirestoreRealtimeService.verifyCitizenStatus(userId, 'rejected');
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, verificationStatus: 'rejected' } : u));
   };
 
   const pendingCount = users.filter(u => u.verificationStatus === 'pending').length;
@@ -71,8 +83,23 @@ export const PenggunaPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Quick KPI stats */}
+        {/* Quick KPI stats & Backend indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            backgroundColor: '#0a1220',
+            border: `1px solid ${isFirebaseConfigured ? 'rgba(16, 185, 129, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
+            borderRadius: '8px',
+            padding: '6px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <Database size={13} color={isFirebaseConfigured ? '#10b981' : '#38bdf8'} />
+            <span style={{ fontSize: '11px', color: isFirebaseConfigured ? '#10b981' : '#38bdf8', fontWeight: 700 }}>
+              {isFirebaseConfigured ? 'Firestore Live Sync' : 'Smart Offline Mode'}
+            </span>
+          </div>
+
           <div style={{
             backgroundColor: '#0a1220',
             border: '1px solid rgba(16, 185, 129, 0.3)',

@@ -5,6 +5,7 @@ import {
   getDoc, 
   setDoc, 
   updateDoc, 
+  deleteDoc,
   onSnapshot, 
   query, 
   orderBy, 
@@ -13,11 +14,11 @@ import {
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../../config/firebase';
 import type { EmergencyAlarm, CitizenReport } from '../../core/types/report.types';
-import type { CitizenUser } from '../../core/types/user.types';
-import type { TerritoryItem } from '../../core/types/territory.types';
+import type { CitizenUser, OfficerAccount } from '../../core/types/user.types';
+import type { TerritoryItem, WorkspaceItem } from '../../core/types/territory.types';
 import { mockEmergencyAlarms, mockCitizenReports } from '../mock/mockReportData';
-import { mockCitizenUsers } from '../mock/mockUserData';
-import { mockTerritoryHierarchy } from '../mock/mockTerritoryData';
+import { mockCitizenUsers, mockOfficerAccounts } from '../mock/mockUserData';
+import { mockTerritoryHierarchy, mockWorkspacesList } from '../mock/mockTerritoryData';
 
 export class FirestoreRealtimeService {
   // ALARMS: Realtime SOS Listener
@@ -28,7 +29,7 @@ export class FirestoreRealtimeService {
     }
 
     try {
-      const q = query(collection(db, 'alarms'), orderBy('timestamp', 'desc'), limit(20));
+      const q = query(collection(db, 'alarms'), limit(20));
       return onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
           callback(mockEmergencyAlarms);
@@ -72,7 +73,7 @@ export class FirestoreRealtimeService {
     }
 
     try {
-      const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'), limit(50));
+      const q = query(collection(db, 'reports'), limit(50));
       return onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
           callback(mockCitizenReports);
@@ -153,6 +154,82 @@ export class FirestoreRealtimeService {
       await updateDoc(ref, { verificationStatus });
     } catch (e) {
       console.warn('Error verifying citizen in Firestore:', e);
+    }
+  }
+
+  // OFFICERS: Realtime Officers
+  static subscribeToOfficers(callback: (officers: OfficerAccount[]) => void) {
+    if (!isFirebaseConfigured || !db) {
+      callback(mockOfficerAccounts);
+      return () => {};
+    }
+
+    try {
+      const q = query(collection(db, 'officers'), limit(50));
+      return onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          callback(mockOfficerAccounts);
+        } else {
+          const items: OfficerAccount[] = [];
+          snapshot.forEach((doc) => {
+            items.push({ id: doc.id, ...doc.data() } as OfficerAccount);
+          });
+          callback(items);
+        }
+      }, (error) => {
+        callback(mockOfficerAccounts);
+      });
+    } catch (e) {
+      callback(mockOfficerAccounts);
+      return () => {};
+    }
+  }
+
+  // WORKSPACES: Realtime Workspaces
+  static subscribeToWorkspaces(callback: (workspaces: WorkspaceItem[]) => void) {
+    if (!isFirebaseConfigured || !db) {
+      callback(mockWorkspacesList);
+      return () => {};
+    }
+
+    try {
+      const q = query(collection(db, 'workspaces'), limit(50));
+      return onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          callback(mockWorkspacesList);
+        } else {
+          const items: WorkspaceItem[] = [];
+          snapshot.forEach((doc) => {
+            items.push({ id: doc.id, ...doc.data() } as WorkspaceItem);
+          });
+          callback(items);
+        }
+      }, (error) => {
+        callback(mockWorkspacesList);
+      });
+    } catch (e) {
+      callback(mockWorkspacesList);
+      return () => {};
+    }
+  }
+
+  // SAVE WORKSPACE
+  static async saveWorkspace(ws: WorkspaceItem): Promise<void> {
+    if (!isFirebaseConfigured || !db) return;
+    try {
+      await setDoc(doc(db, 'workspaces', ws.id), ws);
+    } catch (e) {
+      console.warn('Error saving workspace to Firestore:', e);
+    }
+  }
+
+  // SAVE OFFICER
+  static async saveOfficer(off: OfficerAccount): Promise<void> {
+    if (!isFirebaseConfigured || !db) return;
+    try {
+      await setDoc(doc(db, 'officers', off.id), off);
+    } catch (e) {
+      console.warn('Error saving officer to Firestore:', e);
     }
   }
 }

@@ -1,9 +1,5 @@
-import { MockDashboardService } from './mock/MockDashboardService';
-import { MockWilayahService } from './mock/mockService';
-import type { IDashboardService } from './interfaces/IDashboardService';
-import type { IWilayahService } from './interfaces';
+import { FirestoreDashboardService } from './firestore/FirestoreDashboardService';
+import { mockWilayahService } from './mock/mockWilayahService';
 
-export const dashboardService: IDashboardService = new MockDashboardService();
-export const wilayahService: IWilayahService = new MockWilayahService();
-
-export * from './interfaces/IDashboardService';
+export const dashboardService = new FirestoreDashboardService();
+export const wilayahService = mockWilayahService;
