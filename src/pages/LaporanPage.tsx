@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CitizenReport } from '../core/types/report.types';
-import { mockCitizenReports } from '../services/mock/mockReportData';
+import { FirestoreRealtimeService } from '../services/firestore/firestoreRealtimeService';
+import { isFirebaseConfigured } from '../config/firebase';
 import { ReportDetailModal } from '../components/reports/ReportDetailModal';
 import {
   FileText,
@@ -13,16 +14,25 @@ import {
   Eye,
   Building,
   Trash2,
-  ShieldAlert
+  ShieldAlert,
+  Database
 } from 'lucide-react';
 
 export const LaporanPage: React.FC = () => {
-  const [reports, setReports] = useState<CitizenReport[]>(mockCitizenReports);
+  const [reports, setReports] = useState<CitizenReport[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('Semua');
   const [statusFilter, setStatusFilter] = useState<string>('Semua');
   const [selectedReport, setSelectedReport] = useState<CitizenReport | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  // Subscribe to Realtime Firestore updates
+  useEffect(() => {
+    const unsubscribe = FirestoreRealtimeService.subscribeToCitizenReports((items) => {
+      setReports(items);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filteredReports = reports.filter((r) => {
     const matchQuery = r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -34,8 +44,9 @@ export const LaporanPage: React.FC = () => {
     return matchQuery && matchCategory && matchStatus;
   });
 
-  const handleUpdateStatus = (id: string, newStatus: CitizenReport['status'], assignedTo?: string) => {
-    setReports(reports.map(r => r.id === id ? { ...r, status: newStatus, assignedTo: assignedTo || r.assignedTo, updatedAt: 'Hari ini' } : r));
+  const handleUpdateStatus = async (id: string, newStatus: CitizenReport['status'], assignedTo?: string) => {
+    await FirestoreRealtimeService.updateReportStatus(id, newStatus, assignedTo);
+    setReports(prev => prev.map(r => r.id === id ? { ...r, status: newStatus, assignedTo: assignedTo || r.assignedTo, updatedAt: 'Hari ini' } : r));
   };
 
   const getCategoryIcon = (category: CitizenReport['category']) => {
@@ -77,20 +88,21 @@ export const LaporanPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Quick KPI stats */}
+        {/* Backend & Quick KPI stats */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             backgroundColor: '#0a1220',
-            border: '1px solid rgba(56, 189, 248, 0.3)',
+            border: `1px solid ${isFirebaseConfigured ? 'rgba(16, 185, 129, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
             borderRadius: '8px',
             padding: '6px 12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '6px'
           }}>
-            <Inbox size={14} color="#38bdf8" />
-            <span style={{ fontSize: '11.5px', color: '#94a3b8' }}>Total Laporan:</span>
-            <strong style={{ fontSize: '13px', color: '#ffffff' }}>{reports.length}</strong>
+            <Database size={13} color={isFirebaseConfigured ? '#10b981' : '#38bdf8'} />
+            <span style={{ fontSize: '11px', color: isFirebaseConfigured ? '#10b981' : '#38bdf8', fontWeight: 700 }}>
+              {isFirebaseConfigured ? 'Firestore Live Sync' : 'Smart Offline Mode'}
+            </span>
           </div>
 
           <div style={{

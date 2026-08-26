@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { EmergencyAlarm } from '../core/types/report.types';
-import { mockEmergencyAlarms } from '../services/mock/mockReportData';
+import { FirestoreRealtimeService } from '../services/firestore/firestoreRealtimeService';
+import { isFirebaseConfigured } from '../config/firebase';
 import { AlarmDetailModal } from '../components/reports/AlarmDetailModal';
 import {
   AlertOctagon,
@@ -13,15 +14,24 @@ import {
   Flame,
   HeartPulse,
   Shield,
-  Eye
+  Eye,
+  Database
 } from 'lucide-react';
 
 export const AlarmPage: React.FC = () => {
-  const [alarms, setAlarms] = useState<EmergencyAlarm[]>(mockEmergencyAlarms);
+  const [alarms, setAlarms] = useState<EmergencyAlarm[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'critical' | 'investigating' | 'resolved'>('all');
   const [selectedAlarm, setSelectedAlarm] = useState<EmergencyAlarm | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  // Subscribe to Realtime Firestore updates
+  useEffect(() => {
+    const unsubscribe = FirestoreRealtimeService.subscribeToEmergencyAlarms((items) => {
+      setAlarms(items);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filteredAlarms = alarms.filter((a) => {
     const matchesSearch = a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -31,12 +41,14 @@ export const AlarmPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleResolve = (id: string) => {
-    setAlarms(alarms.map(a => a.id === id ? { ...a, status: 'resolved' } : a));
+  const handleResolve = async (id: string) => {
+    await FirestoreRealtimeService.updateAlarmStatus(id, 'resolved');
+    setAlarms(prev => prev.map(a => a.id === id ? { ...a, status: 'resolved' } : a));
   };
 
-  const handleEscalate = (id: string) => {
-    setAlarms(alarms.map(a => a.id === id ? { ...a, status: 'investigating', respondedBy: 'Posko Keamanan & Tim Bantuan' } : a));
+  const handleEscalate = async (id: string) => {
+    await FirestoreRealtimeService.updateAlarmStatus(id, 'investigating', 'Posko Keamanan & Tim Bantuan');
+    setAlarms(prev => prev.map(a => a.id === id ? { ...a, status: 'investigating', respondedBy: 'Posko Keamanan & Tim Bantuan' } : a));
   };
 
   const criticalCount = alarms.filter(a => a.status === 'critical').length;
@@ -82,8 +94,23 @@ export const AlarmPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Counter KPI */}
+        {/* Backend status & Counter KPI */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            backgroundColor: '#0a1220',
+            border: `1px solid ${isFirebaseConfigured ? 'rgba(16, 185, 129, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
+            borderRadius: '8px',
+            padding: '6px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <Database size={13} color={isFirebaseConfigured ? '#10b981' : '#38bdf8'} />
+            <span style={{ fontSize: '11px', color: isFirebaseConfigured ? '#10b981' : '#38bdf8', fontWeight: 700 }}>
+              {isFirebaseConfigured ? 'Firestore Live Sync' : 'Smart Offline Mode'}
+            </span>
+          </div>
+
           <div style={{
             backgroundColor: 'rgba(239, 68, 68, 0.12)',
             border: '1px solid rgba(239, 68, 68, 0.4)',
@@ -95,22 +122,8 @@ export const AlarmPage: React.FC = () => {
             boxShadow: '0 0 12px rgba(239, 68, 68, 0.2)'
           }}>
             <Radio size={14} color="#ef4444" style={{ animation: 'pulse 1.2s infinite' }} />
-            <span style={{ fontSize: '11.5px', color: '#fca5a5' }}>Sinyal Kritis Aktif:</span>
+            <span style={{ fontSize: '11.5px', color: '#fca5a5' }}>Sinyal Kritis:</span>
             <strong style={{ fontSize: '14px', color: '#ef4444' }}>{criticalCount}</strong>
-          </div>
-
-          <div style={{
-            backgroundColor: '#0a1220',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            borderRadius: '8px',
-            padding: '6px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <Clock size={14} color="#f59e0b" />
-            <span style={{ fontSize: '11.5px', color: '#94a3b8' }}>Investigasi:</span>
-            <strong style={{ fontSize: '13px', color: '#f59e0b' }}>{investigatingCount}</strong>
           </div>
         </div>
       </div>
