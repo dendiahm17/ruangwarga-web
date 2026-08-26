@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { Search, Bell, MessageSquare, ChevronDown } from 'lucide-react';
+import { Search, Bell, MessageSquare, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const Header: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleLogout = () => {
+    if (confirm('Apakah Anda yakin ingin keluar dari RuangWarga Control Center?')) {
+      logout();
+    }
+  };
 
   return (
     <header style={{
@@ -33,11 +39,11 @@ export const Header: React.FC = () => {
         </div>
         <div style={{
           fontSize: '11px',
-          color: '#94a3b8',
-          fontWeight: 500,
+          color: '#00e5ff',
+          fontWeight: 600,
           marginTop: '2px'
         }}>
-          Platform Administrator
+          {user?.role || 'Platform Administrator'}
         </div>
       </div>
 
@@ -149,8 +155,7 @@ export const Header: React.FC = () => {
           padding: '4px 10px 4px 4px',
           backgroundColor: '#0a1220',
           border: '1px solid rgba(56, 189, 248, 0.15)',
-          borderRadius: '24px',
-          cursor: 'pointer'
+          borderRadius: '24px'
         }}>
           <div style={{
             width: '30px',
@@ -166,17 +171,40 @@ export const Header: React.FC = () => {
             color: '#00e5ff',
             boxShadow: '0 0 8px rgba(0, 229, 255, 0.3)'
           }}>
-            AU
+            {user?.name ? user.name.slice(0, 2).toUpperCase() : 'AU'}
           </div>
           <div style={{ textAlign: 'left' }}>
             <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#ffffff', lineHeight: 1.1 }}>
               {user?.name || 'Administrator Utama'}
             </div>
             <div style={{ fontSize: '9.5px', color: '#64748b', fontWeight: 500 }}>
-              Platform Administrator
+              {user?.scopeLabel || 'Seluruh Indonesia'}
             </div>
           </div>
         </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          title="Keluar dari Sistem"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '7px 12px',
+            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#f87171',
+            fontSize: '11.5px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <LogOut size={14} />
+          <span>Keluar</span>
+        </button>
       </div>
     </header>
   );

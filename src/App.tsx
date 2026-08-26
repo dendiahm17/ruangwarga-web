@@ -14,14 +14,21 @@ import { TugasSistemPage } from './pages/TugasSistemPage';
 import { WorkflowPage } from './pages/WorkflowPage';
 import { WawasanPage } from './pages/WawasanPage';
 import { PengaturanPage } from './pages/PengaturanPage';
+import { LoginPage } from './pages/LoginPage';
 import { ScopeProvider } from './context/ScopeContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ScopeSelectorModal } from './components/common/ScopeSelectorModal';
 
 export const AppContent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [currentPath, setCurrentPath] = useState<string>('/dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isScopeModalOpen, setIsScopeModalOpen] = useState<boolean>(false);
+
+  // If user is not logged in, render LoginPage
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
 
   return (
     <div className="app-container">
