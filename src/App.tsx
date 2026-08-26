@@ -10,6 +10,8 @@ import { AlarmPage } from './pages/AlarmPage';
 import { LaporanPage } from './pages/LaporanPage';
 import { RolePermissionPage } from './pages/RolePermissionPage';
 import { AuditTrailPage } from './pages/AuditTrailPage';
+import { TugasSistemPage } from './pages/TugasSistemPage';
+import { WorkflowPage } from './pages/WorkflowPage';
 import { ScopeProvider } from './context/ScopeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ScopeSelectorModal } from './components/common/ScopeSelectorModal';
@@ -73,6 +75,14 @@ export const AppContent: React.FC = () => {
           <AuditTrailPage />
         )}
 
+        {currentPath === '/tugas-sistem' && (
+          <TugasSistemPage />
+        )}
+
+        {currentPath === '/workflow' && (
+          <WorkflowPage />
+        )}
+
         {currentPath !== '/dashboard' &&
          currentPath !== '/wilayah' &&
          currentPath !== '/workspace' &&
@@ -81,7 +91,9 @@ export const AppContent: React.FC = () => {
          currentPath !== '/alarm' &&
          currentPath !== '/laporan' &&
          currentPath !== '/role-permission' &&
-         currentPath !== '/audit-trail' && (
+         currentPath !== '/audit-trail' &&
+         currentPath !== '/tugas-sistem' &&
+         currentPath !== '/workflow' && (
           <div style={{ padding: '32px 24px', maxWidth: '1200px' }}>
             <div className="futuristic-card" style={{ padding: '36px', textAlign: 'center' }}>
               <div style={{
@@ -105,7 +117,7 @@ export const AppContent: React.FC = () => {
                 Modul {currentPath.replace('/', '').replace('-', ' ').toUpperCase()}
               </h2>
               <p style={{ color: '#94a3b8', fontSize: '13px', maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: 1.4 }}>
-                Modul ini telah terhubung ke arsitektur data RuangWarga Control Center dan siap dikembangkan berikutnya.
+                Modul ini telah terhubung ke arsitektur data RuangWarga Control Center.
               </p>
               <button
                 onClick={() => setCurrentPath('/dashboard')}
