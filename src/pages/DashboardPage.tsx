@@ -34,13 +34,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScopeModal, 
   const { currentScope } = useScope();
   const { user } = useAuth();
 
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [metrics, setMetrics] = useState<DashboardMetrics>(() => ({
+    totalWorkspace: { value: '120.654', change: '+2,06%', isPositive: true },
+    totalWargaAktif: { value: '25.684.112', change: '+1,37%', isPositive: true },
+    totalAktivitas: { value: '184.932', change: '+7,44%', isPositive: true },
+    laporanMasuk: { value: '5.432', change: '+11,11%', isPositive: false },
+    tingkatRespons: { value: '92,7%', change: '+3,4%', isPositive: true },
+    kegiatanSelesai: { value: '14.287', change: '+6,7%', isPositive: true },
+  }));
   const [tasks, setTasks] = useState<SystemTask[]>([]);
   const [alarms, setAlarms] = useState<SystemAlarm[]>([]);
   const [regions, setRegions] = useState<PriorityRegion[]>([]);
   const [distributions, setDistributions] = useState<WorkspaceDistribution[]>([]);
   const [activities, setActivities] = useState<RealtimeActivity[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const loadDashboardData = async () => {
