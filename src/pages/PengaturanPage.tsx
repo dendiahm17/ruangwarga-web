@@ -300,6 +300,46 @@ export const PengaturanPage: React.FC = () => {
                 </span>
               </div>
 
+              {/* Seed Firestore Database Card */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '14px 16px',
+                backgroundColor: 'rgba(0, 229, 255, 0.05)',
+                border: '1px dashed rgba(0, 229, 255, 0.3)',
+                borderRadius: '8px'
+              }}>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#00e5ff' }}>Inisialisasi Data Awal Firestore (Database Seeder)</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
+                    Otomatis membuat koleksi awal (territories, workspaces, users, alarms, reports, roles).
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const { seedInitialFirestoreData } = await import('../services/firestore/seedFirestore');
+                    const res = await seedInitialFirestoreData();
+                    alert(res.message);
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    backgroundColor: 'rgba(0, 229, 255, 0.2)',
+                    border: '1px solid #00e5ff',
+                    borderRadius: '6px',
+                    color: '#00e5ff',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 0 10px rgba(0, 229, 255, 0.2)'
+                  }}
+                >
+                  🚀 Jalankan Seeder
+                </button>
+              </div>
+
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
